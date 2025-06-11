@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude sensitive AI model data and database -->
+    <exclude domain="database" path="gesture_ai_database"/>
+    <exclude domain="sharedpref" path="ai_stack_preferences.xml"/>
+    <exclude domain="external" path="models/"/>
+</full-backup-content>

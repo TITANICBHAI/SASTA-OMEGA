@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#2196F3">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Game Configuration Wizard"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/tv_step_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Step 1 of 3"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- ViewPager for wizard steps -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vp_wizard_steps"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Navigation buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#FFFFFF">
+
+        <Button
+            android:id="@+id/btn_previous"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Previous"
+            android:layout_marginEnd="8dp"
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Next"
+            android:layout_marginStart="8dp" />
+
+        <Button
+            android:id="@+id/btn_finish"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Finish"
+            android:layout_marginStart="8dp"
+            android:visibility="gone"
+            android:background="#4CAF50" />
+
+    </LinearLayout>
+
+</LinearLayout>

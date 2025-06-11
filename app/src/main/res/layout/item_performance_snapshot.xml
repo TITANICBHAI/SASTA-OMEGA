@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/item_background"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/timestampText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="2024-01-15 14:30:25"
+            android:textSize="14sp"
+            android:textColor="@color/text_secondary" />
+
+        <TextView
+            android:id="@+id/gameTypeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MOBA"
+            android:textSize="12sp"
+            android:textColor="@color/accent_blue"
+            android:background="@drawable/game_type_background"
+            android:padding="4dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Actions"
+                android:textSize="10sp"
+                android:textColor="@color/text_tertiary" />
+
+            <TextView
+                android:id="@+id/actionsCountText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="247"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Success Rate"
+                android:textSize="10sp"
+                android:textColor="@color/text_tertiary" />
+
+            <TextView
+                android:id="@+id/successRateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="88.7%"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/success_green" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Avg Latency"
+                android:textSize="10sp"
+                android:textColor="@color/text_tertiary" />
+
+            <TextView
+                android:id="@+id/latencyText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="42ms"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/warning_orange" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

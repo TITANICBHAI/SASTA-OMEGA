@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_feature"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="4dp"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_feature_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Neural Networks"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="→"
+                android:textColor="@color/accent_primary"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_feature_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DQN & PPO Models"
+            android:textColor="@color/accent_primary"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tv_feature_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Manage deep learning models"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:layout_marginTop="4dp" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

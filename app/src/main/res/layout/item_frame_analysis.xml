@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="120dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_frame_thumbnail"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:background="@color/surface_color" />
+
+        <TextView
+            android:id="@+id/tv_frame_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Frame 1"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/tv_reasoning_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="○ No Reasoning"
+            android:textSize="10sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tv_confidence"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AI: 0%"
+            android:textSize="10sp"
+            android:textColor="@color/text_secondary"
+            android:gravity="center" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- No sensitive data should be backed up to cloud -->
+        <exclude domain="sharedpref" path="ai_stack_preferences.xml"/>
+        <exclude domain="database" path="gesture_ai_database"/>
+    </cloud-backup>
+    
+    <device-transfer>
+        <!-- Allow basic app preferences transfer -->
+        <include domain="sharedpref" path="app_preferences.xml"/>
+    </device-transfer>
+</data-extraction-rules>

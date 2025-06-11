@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Performance Monitoring"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Real-time Metrics -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Real-time Performance"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Success Rate"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/successRateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="85.2%"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/success_green" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Avg Latency"
+                        android:textColor="@color/text_secondary" />
+
+                    <TextView
+                        android:id="@+id/latencyText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="45ms"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/warning_orange" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Performance History -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/card_background"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Performance History"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="12dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/performanceHistoryList"
+                android:layout_width="match_parent"
+                android:layout_height="300dp" />
+
+        </LinearLayout>
+
+        <!-- Export and Settings -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/exportDataButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Export Data"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/settingsButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Settings"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

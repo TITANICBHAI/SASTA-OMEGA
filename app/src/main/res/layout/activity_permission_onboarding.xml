@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/background_primary">
+
+    <!-- App Logo/Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AI Game Automation"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:textAlignment="center"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Welcome! Let's set up the required permissions."
+        android:textSize="16sp"
+        android:textColor="@color/text_secondary"
+        android:textAlignment="center"
+        android:layout_marginBottom="48dp" />
+
+    <!-- Permission Cards -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accessibility Service"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Required for automated touch interactions and game control."
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btn_enable_accessibility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable Accessibility"
+                android:backgroundTint="@color/primary" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="System Overlay"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Required for displaying controls over other apps."
+                android:textColor="@color/text_secondary"
+                android:layout_marginBottom="12dp" />
+
+            <Button
+                android:id="@+id/btn_enable_overlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable Overlay"
+                android:backgroundTint="@color/primary" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Status -->
+    <TextView
+        android:id="@+id/tv_permission_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Please grant the required permissions to continue."
+        android:textAlignment="center"
+        android:textColor="@color/text_secondary"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Continue Button -->
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Continue to App"
+        android:backgroundTint="@color/accent_primary"
+        android:enabled="false"
+        android:layout_marginTop="auto" />
+
+</LinearLayout>

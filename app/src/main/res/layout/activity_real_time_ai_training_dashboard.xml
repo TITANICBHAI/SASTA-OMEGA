@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/gradient_background"
+    tools:context=".activities.RealTimeAITrainingDashboardActivity">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="24dp">
+
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            android:background="@drawable/button_secondary"
+            android:textColor="@android:color/white"
+            android:padding="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Real-Time AI Training"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp" />
+
+        <Button
+            android:id="@+id/btn_export_training_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Training Status Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@drawable/card_background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Training Status"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Status:"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tv_training_status"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Idle"
+                            android:textColor="@color/status_indicator" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Progress:"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="8dp" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_training_progress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_progress_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="0%"
+                        android:textColor="@android:color/white"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_start_training"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Start Training"
+                            android:background="@drawable/button_success"
+                            android:textColor="@android:color/white"
+                            android:layout_marginEnd="8dp" />
+
+                        <Button
+                            android:id="@+id/btn_pause_training"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Pause"
+                            android:background="@drawable/button_secondary"
+                            android:textColor="@android:color/white"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Real-Time Metrics Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@drawable/card_background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Real-Time Metrics"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Loss:"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tv_current_loss"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Accuracy:"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tv_current_accuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Learning Rate:"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tv_learning_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Epoch:"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tv_current_epoch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="--"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Training Configuration -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@drawable/card_background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Training Configuration"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="16dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Training Algorithm:"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="8dp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_algorithm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/input_background" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Batch Size:"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="8dp" />
+
+                    <EditText
+                        android:id="@+id/et_batch_size"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="32"
+                        android:inputType="number"
+                        android:textColorHint="@android:color/darker_gray"
+                        android:textColor="@android:color/white"
+                        android:background="@drawable/input_background"
+                        android:padding="12dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <CheckBox
+                        android:id="@+id/cb_adaptive_learning"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Adaptive Learning Rate"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="12dp" />
+
+                    <CheckBox
+                        android:id="@+id/cb_early_stopping"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Early Stopping"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="16dp" />
+
+                    <Button
+                        android:id="@+id/btn_apply_config"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Apply Configuration"
+                        android:background="@drawable/button_primary"
+                        android:textColor="@android:color/white" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Training History -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@drawable/card_background"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Training Sessions"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:layout_marginBottom="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_training_sessions"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:scrollbars="vertical"
+                        android:layout_marginBottom="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/btn_view_detailed_history"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="View Details"
+                            android:background="@drawable/button_secondary"
+                            android:textColor="@android:color/white"
+                            android:layout_marginEnd="8dp" />
+
+                        <Button
+                            android:id="@+id/btn_clear_history"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Clear History"
+                            android:background="@drawable/button_danger"
+                            android:textColor="@android:color/white"
+                            android:layout_marginStart="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

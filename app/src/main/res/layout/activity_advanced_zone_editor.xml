@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/light_gray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <TextView
+            style="@style/HeaderText"
+            android:text="Advanced Zone Editor" />
+
+        <!-- Zone Drawing Canvas -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Detection Zone Canvas" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/card_background">
+
+                    <ImageView
+                        android:id="@+id/iv_game_screenshot"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop" />
+
+                    <View
+                        android:id="@+id/zone_drawing_overlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <TextView
+                        android:id="@+id/tv_canvas_instructions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Load screenshot to start drawing zones"
+                        android:textColor="@color/medium_gray"
+                        android:background="@color/card_background"
+                        android:padding="8dp" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_load_screenshot"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Load Screenshot" />
+
+                    <Button
+                        android:id="@+id/btn_take_screenshot"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Take Screenshot" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Drawing Tools -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Drawing Tools" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_rectangle_tool"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Rectangle" />
+
+                    <Button
+                        android:id="@+id/btn_circle_tool"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Circle" />
+
+                    <Button
+                        android:id="@+id/btn_polygon_tool"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Polygon" />
+
+                    <Button
+                        android:id="@+id/btn_freehand_tool"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Freehand" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/BodyText"
+                        android:layout_weight="1"
+                        android:text="Zone Color" />
+
+                    <Spinner
+                        android:id="@+id/spinner_zone_color"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:layout_margin="8dp"
+                        android:background="@drawable/input_background" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_undo"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Undo" />
+
+                    <Button
+                        android:id="@+id/btn_clear_all"
+                        style="@style/DangerButton"
+                        android:layout_weight="1"
+                        android:text="Clear All" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Zone Configuration -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Zone Configuration" />
+
+                <EditText
+                    android:id="@+id/et_zone_name"
+                    style="@style/InputField"
+                    android:hint="Zone name (e.g., 'Enemy Spawn Area')" />
+
+                <TextView
+                    style="@style/BodyText"
+                    android:text="Zone Type" />
+
+                <Spinner
+                    android:id="@+id/spinner_zone_type"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/input_background" />
+
+                <TextView
+                    style="@style/BodyText"
+                    android:text="Action Priority" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_zone_priority"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:max="10"
+                    android:progress="5" />
+
+                <TextView
+                    android:id="@+id/tv_priority_value"
+                    style="@style/BodyText"
+                    android:text="Priority: 5"
+                    android:textAlignment="center" />
+
+                <Button
+                    android:id="@+id/btn_save_zone"
+                    style="@style/PrimaryButton"
+                    android:text="Save Zone" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Zone List -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/SubHeaderText"
+                        android:layout_weight="1"
+                        android:text="Detection Zones" />
+
+                    <TextView
+                        android:id="@+id/tv_zone_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="16sp"
+                        android:textColor="@color/colorPrimary"
+                        android:textStyle="bold"
+                        android:padding="8dp" />
+
+                </LinearLayout>
+
+                <RecyclerView
+                    android:id="@+id/rv_zone_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="8dp"
+                    android:background="@drawable/input_background" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_export_zones"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Export Zones" />
+
+                    <Button
+                        android:id="@+id/btn_import_zones"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Import Zones" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Zone Testing -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Zone Testing" />
+
+                <CheckBox
+                    android:id="@+id/cb_show_zone_overlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Show Zone Overlay in Game"
+                    android:checked="true"
+                    android:layout_margin="8dp" />
+
+                <CheckBox
+                    android:id="@+id/cb_highlight_active_zones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Highlight Active Zones"
+                    android:layout_margin="8dp" />
+
+                <Button
+                    android:id="@+id/btn_test_zones"
+                    style="@style/PrimaryButton"
+                    android:text="Test Zone Detection" />
+
+                <TextView
+                    android:id="@+id/tv_zone_test_status"
+                    style="@style/BodyText"
+                    android:text="Zones ready for testing"
+                    android:textAlignment="center"
+                    android:textColor="@color/status_ready" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+</ScrollView>

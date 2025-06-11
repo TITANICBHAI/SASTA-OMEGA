@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Comprehensive Analytics"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="16dp"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white" />
+
+    <!-- Tab Layout -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary" />
+
+    <!-- Content Container -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Overview Section -->
+            <LinearLayout
+                android:id="@+id/layout_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Overview Statistics"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Stats Grid -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_total_sessions"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Sessions"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_total_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0h 0m"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total Time"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_win_rate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Win Rate"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_avg_score"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Avg Score"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_best_score"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Best Score"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="8dp">
+
+                        <TextView
+                            android:id="@+id/tv_current_streak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Current Streak"
+                            android:textSize="12sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Performance Section -->
+            <LinearLayout
+                android:id="@+id/layout_performance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Performance Metrics"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/tv_aim_accuracy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Aim Accuracy: 0%"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_reaction_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Reaction Time: 0ms"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_decision_accuracy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Decision Accuracy: 0%"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_resource_efficiency"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Resource Efficiency: 0%"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_strategy_success"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Strategy Success: 0%"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Overall Performance"
+                    android:layout_marginBottom="4dp" />
+
+                <ProgressBar
+                    android:id="@+id/pb_overall_performance"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100" />
+
+            </LinearLayout>
+
+            <!-- AI Learning Section -->
+            <LinearLayout
+                android:id="@+id/layout_ai_learning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="AI Learning Progress"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:id="@+id/tv_model_accuracy"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Model Accuracy: 0%"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_training_episodes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Training Episodes: 0"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_learning_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Learning Progress: 0%"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_adaptation_rate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Adaptation Rate: 0.000"
+                    android:layout_marginBottom="16dp" />
+
+                <ProgressBar
+                    android:id="@+id/pb_learning_progress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:max="100" />
+
+            </LinearLayout>
+
+            <!-- Game Stats Section -->
+            <LinearLayout
+                android:id="@+id/layout_game_stats"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Game-Specific Statistics"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Battle Royale Stats -->
+                <LinearLayout
+                    android:id="@+id/layout_battle_royale_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Battle Royale Statistics"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_survival_rate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Survival Rate: 0%"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_avg_placement"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Average Placement: 0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_kill_death_ratio"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="K/D Ratio: 0.00"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_damage_per_match"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Damage per Match: 0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_zone_awareness"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Zone Awareness: 0%"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+                <!-- MOBA Stats -->
+                <LinearLayout
+                    android:id="@+id/layout_moba_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="MOBA Statistics"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_cs_per_minute"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="CS per Minute: 0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_kda"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="KDA: 0/0/0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_gold_per_minute"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Gold per Minute: 0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_ward_score"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Ward Score: 0"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_objective_participation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Objective Participation: 0%"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+                <!-- FPS Stats -->
+                <LinearLayout
+                    android:id="@+id/layout_fps_stats"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="FPS Statistics"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tv_headshot_percentage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Headshot %: 0%"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_accuracy_stats"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Accuracy: 0%"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_movement_efficiency"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Movement Efficiency: 0%"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_weapon_mastery"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Weapon Mastery: 0%"
+                        android:layout_marginBottom="4dp" />
+
+                    <TextView
+                        android:id="@+id/tv_map_knowledge"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Map Knowledge: 0%"
+                        android:layout_marginBottom="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Monitoring Section -->
+            <LinearLayout
+                android:id="@+id/layout_monitoring"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Real-time Monitoring"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp" />
+
+                <Switch
+                    android:id="@+id/switch_realtime_monitoring"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Real-time Monitoring"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="CPU Usage:" />
+
+                    <TextView
+                        android:id="@+id/tv_current_cpu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0%" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Memory Usage:" />
+
+                    <TextView
+                        android:id="@+id/tv_current_memory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0%" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="FPS:" />
+
+                    <TextView
+                        android:id="@+id/tv_current_fps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Latency:" />
+
+                    <TextView
+                        android:id="@+id/tv_current_latency"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0ms" />
+
+                </LinearLayout>
+
+                <!-- Export/Clear Controls -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_export_data"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Export Data"
+                        android:layout_marginEnd="8dp" />
+
+                    <Button
+                        android:id="@+id/btn_clear_history"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Clear History"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+                <!-- Session History -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Session History"
+                    android:textStyle="bold"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
+
+                <ListView
+                    android:id="@+id/lv_session_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="#f8f8f8" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

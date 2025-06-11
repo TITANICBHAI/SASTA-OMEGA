@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Training Progress Visualizer"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Training Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Training Status"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Epoch:" />
+
+                <TextView
+                    android:id="@+id/tv_current_epoch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="/" />
+
+                <TextView
+                    android:id="@+id/tv_total_epochs"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="100" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_training_loss"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loss: 0.0000"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_validation_accuracy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accuracy: 0%"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_learning_rate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Learning Rate: 0.001"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_training_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Time: 00:00:00"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_estimated_completion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ETA: --:--:--" />
+
+        </LinearLayout>
+
+        <!-- Progress Bars -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Training Progress"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_training_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_epoch_progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_model_accuracy"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100" />
+
+        </LinearLayout>
+
+        <!-- Training Controls -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btn_start_training"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Start"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/btn_pause_training"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Pause"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/btn_stop_training"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Stop"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp" />
+
+            <Button
+                android:id="@+id/btn_save_model"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+        <!-- Model Comparison -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Model Comparison"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_model_comparison"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#FFFFFF"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+</ScrollView>

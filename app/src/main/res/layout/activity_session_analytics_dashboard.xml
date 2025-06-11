@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Session Analytics Dashboard"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Session Overview -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Session Overview"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Total Sessions:" />
+
+                <TextView
+                    android:id="@+id/tv_total_sessions"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:gravity="end"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Total Play Time:" />
+
+                <TextView
+                    android:id="@+id/tv_total_play_time"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0m"
+                    android:gravity="end"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Average Score:" />
+
+                <TextView
+                    android:id="@+id/tv_average_score"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0"
+                    android:gravity="end"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Improvement Rate:" />
+
+                <TextView
+                    android:id="@+id/tv_improvement_rate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0%"
+                    android:gravity="end"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- AI Performance Comparison -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="AI Performance Comparison"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DQN Agent:" />
+
+                <TextView
+                    android:id="@+id/tv_dqn_performance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0% Accuracy"
+                    android:gravity="end" />
+
+                <ProgressBar
+                    android:id="@+id/pb_dqn_accuracy"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PPO Agent:" />
+
+                <TextView
+                    android:id="@+id/tv_ppo_performance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0% Accuracy"
+                    android:gravity="end" />
+
+                <ProgressBar
+                    android:id="@+id/pb_ppo_accuracy"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Hybrid:" />
+
+                <TextView
+                    android:id="@+id/tv_hybrid_performance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="0% Accuracy"
+                    android:gravity="end" />
+
+                <ProgressBar
+                    android:id="@+id/pb_hybrid_accuracy"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="100" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Filters -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Spinner
+                android:id="@+id/spinner_game_type"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp" />
+
+            <Spinner
+                android:id="@+id/spinner_time_range"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp" />
+
+            <Button
+                android:id="@+id/btn_apply_filters"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Apply"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Session History -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Session History"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_session_history"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:background="#FFFFFF"
+            android:padding="8dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_export_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Export Analytics Data"
+            android:background="#2196F3"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
+
+</ScrollView>

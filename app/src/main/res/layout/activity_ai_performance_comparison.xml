@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_dark"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Header -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="AI Performance Comparison"
+        android:textColor="@color/text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Performance Metrics -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Agent Performance"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <!-- DQN Performance -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="DQN Agent"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <ProgressBar
+                    android:id="@+id/pb_dqn_performance"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:progress="75"
+                    android:layout_marginHorizontal="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_dqn_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="75%"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- PPO Performance -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="PPO Agent"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <ProgressBar
+                    android:id="@+id/pb_ppo_performance"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:progress="82"
+                    android:layout_marginHorizontal="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_ppo_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="82%"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <!-- Hybrid Performance -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Hybrid Agent"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
+
+                <ProgressBar
+                    android:id="@+id/pb_hybrid_performance"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:progress="88"
+                    android:layout_marginHorizontal="8dp" />
+
+                <TextView
+                    android:id="@+id/tv_hybrid_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="88%"
+                    android:textColor="@color/text_primary"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Component Status -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Component Status"
+                android:textColor="@color/text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tv_zone_tracker_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Zone Tracker: Active"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_weapon_recognizer_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Weapon Recognizer: Active"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_team_classifier_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Team Classifier: Active"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Test Controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <Button
+            android:id="@+id/btn_start_performance_test"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:text="Start Test"
+            android:backgroundTint="@color/button_success"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_stop_performance_test"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Stop Test"
+            android:backgroundTint="@color/button_danger"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <!-- Performance Comparison Table -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_performance_comparison"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Test Status -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:id="@+id/tv_test_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Test Status: Ready"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <ProgressBar
+            android:id="@+id/pb_test_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="0"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</LinearLayout>
