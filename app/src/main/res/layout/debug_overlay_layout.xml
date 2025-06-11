@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Debug Canvas for Visualization -->
+    <ImageView
+        android:id="@+id/iv_debug_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="matrix" />
+
+    <!-- Control Panel -->
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="#CC000000"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Touch Coordinates -->
+        <TextView
+            android:id="@+id/tv_touch_coordinates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Touch: (0, 0)"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Performance Metrics -->
+        <TextView
+            android:id="@+id/tv_performance_metrics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Performance:\nFPS: 0\nCPU: 0%\nMemory: 0 MB"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- AI Status -->
+        <TextView
+            android:id="@+id/tv_ai_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AI Status:\nInactive"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Control Buttons -->
+        <Button
+            android:id="@+id/btn_toggle_detection"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Hide Detection"
+            android:textSize="10sp"
+            android:layout_marginBottom="2dp" />
+
+        <Button
+            android:id="@+id/btn_toggle_zones"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Hide Zones"
+            android:textSize="10sp"
+            android:layout_marginBottom="2dp" />
+
+        <Button
+            android:id="@+id/btn_toggle_performance"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Hide Performance"
+            android:textSize="10sp"
+            android:layout_marginBottom="2dp" />
+
+        <Button
+            android:id="@+id/btn_close_debug"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:text="Close"
+            android:textSize="10sp"
+            android:background="#CCFF0000" />
+
+    </LinearLayout>
+
+</FrameLayout>

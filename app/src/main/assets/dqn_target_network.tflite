@@ -1,0 +1,4 @@
+# DQN Target Network Model Placeholder
+# Target network for stable Q-learning training
+# Input: 55-dimensional state vector (float32) 
+# Output: 9-dimensional Q-values (float32)

@@ -1,0 +1,4 @@
+# Object Detection Model Placeholder
+# Mobile-optimized object detection for game elements
+# Input: 320x320x3 RGB image
+# Output: Bounding boxes, classes, confidence scores

@@ -1,0 +1,4 @@
+# PPO Actor Network Model Placeholder
+# Policy network for action probabilities
+# Input: 55-dimensional state vector (float32)
+# Output: 9-dimensional logits (float32)

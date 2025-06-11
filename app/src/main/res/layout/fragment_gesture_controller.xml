@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/text_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gesture recognition stopped"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/button_start"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Start"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/success_green"
+                    android:textColor="@color/white" />
+
+                <Button
+                    android:id="@+id/button_stop"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Stop"
+                    android:layout_marginStart="8dp"
+                    android:background="@color/error_red"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+            <Switch
+                android:id="@+id/switch_auto_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto Mode"
+                android:layout_marginTop="16dp" />
+            <!-- ADD THESE MISSING VIEWS HERE -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confidence Threshold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+            <SeekBar
+                android:id="@+id/seekbar_confidence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="75"
+                android:layout_marginBottom="16dp" />
+            <TextView
+                android:id="@+id/tv_gestures_performed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gestures Performed: 0"
+                android:textSize="14sp"
+                android:layout_marginBottom="8dp" />
+            <Switch
+                android:id="@+id/switch_advanced_gestures"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Advanced Gestures"
+                android:layout_marginBottom="16dp" />
+            <!-- Add after switch_auto_mode -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Advanced Gesture Controls"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sensitivity"
+                android:layout_marginBottom="4dp" />
+
+            <SeekBar
+                android:id="@+id/seekbar_sensitivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:max="100"
+                android:progress="50"
+                android:layout_marginBottom="16dp" />
+
+            <Spinner
+                android:id="@+id/spinner_gesture_model"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp" />
+
+            <Button
+                android:id="@+id/btn_calibrate_gestures"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Calibrate Gestures"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/tv_gesture_accuracy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Accuracy: Unknown"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/pb_gesture_processing"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Camera Preview Section -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:background="#f0f0f0">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Camera preview will appear here"
+            android:textColor="#666"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/camera_surface_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+</LinearLayout>

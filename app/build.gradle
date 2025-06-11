@@ -1,0 +1,168 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.gestureai.gameautomation'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.gestureai.gameautomation"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Enable multidex for large dependencies
+        multiDexEnabled true
+
+        // TensorFlow Lite configuration
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+            // Example: only include these two
+            packagingOptions {
+                pickFirst '**/libc++_shared.so'
+                pickFirst '**/libjsc.so'
+
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+    buildFeatures {
+        viewBinding true
+        dataBinding true
+    }
+
+    packagingOptions {
+        pickFirst '**/libc++_shared.so'
+        pickFirst '**/libjsc.so'
+        pickFirst '**/reflect-config.json'
+        pickFirst '**/jni-config.json'
+        exclude 'META-INF/native-image/ios-x86_64/**'
+        exclude 'META-INF/native-image/linux-x86_64/**'
+        exclude 'META-INF/native-image/macosx-x86_64/**'
+        exclude 'META-INF/native-image/windows-x86_64/**'
+        exclude '**/ffmpeg'
+        exclude 'lib/**'
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-stdlib:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22'
+        force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22'
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // Core Android dependencies
+    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-service:2.6.1'
+    implementation 'androidx.work:work-runtime:2.8.1'
+
+    // Camera dependencies
+    implementation 'androidx.camera:camera-core:1.2.3'
+    implementation 'androidx.camera:camera-camera2:1.2.3'
+    implementation 'androidx.camera:camera-lifecycle:1.2.3'
+    implementation 'androidx.camera:camera-view:1.2.3'
+
+    // Room database
+    implementation 'androidx.room:room-runtime:2.5.0'
+    implementation 'com.google.ai.edge.litert:litert-gpu-api:1.3.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+
+    // Logging
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
+    // MediaPipe dependencies
+//    implementation 'com.google.mediapipe:solution-core:0.10.7'
+//    implementation 'com.google.mediapipe:hands:0.10.7'
+//    implementation 'com.google.mediapipe:tasks-vision:0.10.7'
+    implementation 'com.google.mediapipe:tasks-vision:0.10.9'
+
+
+
+    // TensorFlow Lite for ML
+    implementation 'org.tensorflow:tensorflow-lite:2.13.0'
+    implementation 'org.tensorflow:tensorflow-lite-support:0.4.4'
+    // TensorFlow Lite GPU delegate
+    implementation 'org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4'
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.13.0'
+
+    // OpenCV for computer vision (real implementation)
+    implementation files('libs/opencv-455.aar')
+    implementation project(':openCVLibrary')
+
+
+
+
+    implementation('org.deeplearning4j:deeplearning4j-core:1.0.0-M2.1') {
+        exclude group: 'com.google.guava'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'org.nd4j', module: 'protobuf'
+        exclude group: 'org.nd4j', module: 'guava'
+    }
+    implementation('org.nd4j:nd4j-native-platform:1.0.0-M2.1') {
+        exclude group: 'com.google.guava'
+        exclude group: 'com.google.code.findbugs'
+        exclude group: 'org.nd4j', module: 'protobuf'
+        exclude group: 'org.nd4j', module: 'guava'
+    }
+
+    // ML Kit for computer vision and text recognition
+    implementation 'com.google.mlkit:object-detection:17.0.0'
+    implementation 'com.google.mlkit:text-recognition:16.0.0'
+
+    // Apache OpenNLP for natural language processing (lighter version)
+    implementation 'org.apache.opennlp:opennlp-tools:1.9.4'
+
+    // Gson for JSON parsing
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // RecyclerView for lists
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    // Fragment support
+    implementation 'androidx.fragment:fragment:1.6.0'
+    // Charts and visualization
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+
+// Preferences and settings
+    implementation 'androidx.preference:preference:1.2.1'
+
+// ViewPager2 for tabs
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+
+// Material Components (update version)
+    implementation 'com.google.android.material:material:1.10.0'
+
+
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

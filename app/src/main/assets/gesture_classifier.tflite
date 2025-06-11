@@ -1,0 +1,12 @@
+# TensorFlow Lite Model Placeholder
+
+This file represents where the gesture classification model should be placed.
+
+To add a real model:
+1. Train a TensorFlow model for gesture recognition using MediaPipe hand landmarks
+2. Convert the model to TensorFlow Lite format (.tflite)
+3. Replace this file with your trained model
+4. Ensure the model expects input shape [1, 63] (21 landmarks × 3 coordinates)
+5. Ensure the model outputs probabilities for gesture classes
+
+Without a real model, the MLModelManager will use fallback gesture recognition.

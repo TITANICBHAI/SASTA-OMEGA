@@ -1,0 +1,3 @@
+# PPO Value Network Model Placeholder
+# This file will be replaced with actual TensorFlow Lite model during runtime
+# The app will download or generate the PPO value model on first run

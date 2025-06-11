@@ -1,0 +1,34 @@
+{
+  "templates": [
+    {
+      "name": "yellow_coin",
+      "default_action": "COLLECT",
+      "description": "Collect yellow coins for points",
+      "hsv_lower": [20, 100, 100],
+      "hsv_upper": [30, 255, 255],
+      "min_size": 15,
+      "max_size": 25,
+      "confidence_threshold": 0.7
+    },
+    {
+      "name": "train_obstacle",
+      "default_action": "AVOID",
+      "description": "Jump or slide to avoid train",
+      "hsv_lower": [0, 0, 0],
+      "hsv_upper": [180, 50, 50],
+      "min_size": 100,
+      "max_size": 300,
+      "confidence_threshold": 0.8
+    },
+    {
+      "name": "jetpack_powerup",
+      "default_action": "ACTIVATE_POWERUP",
+      "description": "Activate jetpack power-up",
+      "hsv_lower": [100, 150, 150],
+      "hsv_upper": [120, 255, 255],
+      "min_size": 20,
+      "max_size": 40,
+      "confidence_threshold": 0.75
+    }
+  ]
+}

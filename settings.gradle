@@ -1,0 +1,5 @@
+rootProject.name = "GestureAIGameAutomation"
+include ':app'
+                   // This line includes your main app module
+include ':openCVLibrary'
+include ':openCVLibrary'

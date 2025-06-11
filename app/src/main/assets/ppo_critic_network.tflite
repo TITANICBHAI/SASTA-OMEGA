@@ -1,0 +1,4 @@
+# PPO Critic Network Model Placeholder
+# Value network for state value estimation
+# Input: 55-dimensional state vector (float32)
+# Output: Single value estimate (float32)

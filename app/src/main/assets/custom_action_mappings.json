@@ -1,0 +1,22 @@
+{
+  "action_mappings": {
+    "hop": "JUMP",
+    "leap": "JUMP",
+    "bound": "JUMP",
+    "spring": "JUMP",
+    "duck": "SLIDE",
+    "crouch": "SLIDE",
+    "crawl": "SLIDE",
+    "dodge": "AVOID",
+    "evade": "AVOID",
+    "sidestep": "MOVE_LEFT",
+    "strafe": "MOVE_RIGHT",
+    "grab": "COLLECT",
+    "snatch": "COLLECT",
+    "gather": "COLLECT",
+    "pick": "COLLECT",
+    "boost": "ACTIVATE_POWERUP",
+    "power": "ACTIVATE_POWERUP",
+    "activate": "ACTIVATE_POWERUP"
+  }
+}

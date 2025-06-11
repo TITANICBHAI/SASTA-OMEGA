@@ -1,0 +1,6 @@
+# DQN Q-Network Model Placeholder
+# This file represents the Deep Q-Network for reinforcement learning
+# Input: 55-dimensional state vector (float32)
+# Output: 9-dimensional Q-values (float32)
+# Architecture: Dense layers with ReLU activation
+# Expected shape: [1, 55] → [1, 9]
