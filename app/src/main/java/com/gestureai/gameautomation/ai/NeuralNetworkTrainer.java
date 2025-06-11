@@ -12,24 +12,17 @@ public class NeuralNetworkTrainer {
     
     private Context context;
     private ExecutorService trainingExecutor;
-    private volatile boolean isTraining = false;
-    private volatile float learningRate = 0.001f;
-    private volatile int batchSize = 32;
-    private volatile int epochs = 100;
-    private final List<TrainingListener> listeners;
-    private final Object trainingLock = new Object();
+    private boolean isTraining = false;
+    private float learningRate = 0.001f;
+    private int batchSize = 32;
+    private int epochs = 100;
+    private List<TrainingListener> listeners;
     
     public interface TrainingListener {
         void onTrainingStarted();
         void onEpochCompleted(int epoch, float loss, float accuracy);
         void onTrainingCompleted(float finalLoss, float finalAccuracy);
         void onTrainingFailed(Exception error);
-    }
-    
-    public interface TrainingCallback {
-        void onEpochComplete(int epoch, float loss);
-        void onTrainingComplete();
-        void onTrainingError(String error);
     }
     
     public static class TrainingData {
@@ -48,54 +41,21 @@ public class NeuralNetworkTrainer {
     
     public NeuralNetworkTrainer(Context context) {
         this.context = context;
-        this.trainingExecutor = Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, "NeuralNetworkTraining");
-            t.setDaemon(false);
-            return t;
-        });
+        this.trainingExecutor = Executors.newSingleThreadExecutor();
         this.listeners = new ArrayList<>();
         Log.d(TAG, "NeuralNetworkTrainer initialized");
     }
     
-    public void cleanup() {
-        synchronized (trainingLock) {
-            if (trainingExecutor != null && !trainingExecutor.isShutdown()) {
-                trainingExecutor.shutdown();
-                try {
-                    if (!trainingExecutor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-                        trainingExecutor.shutdownNow();
-                        Log.w(TAG, "Training executor forced shutdown");
-                    }
-                } catch (InterruptedException e) {
-                    trainingExecutor.shutdownNow();
-                    Thread.currentThread().interrupt();
-                    Log.w(TAG, "Training executor shutdown interrupted");
-                }
-            }
-            
-            synchronized (listeners) {
-                listeners.clear();
-            }
-            
-            isTraining = false;
-            Log.d(TAG, "NeuralNetworkTrainer cleaned up");
-        }
-    }
-    
     public void addTrainingListener(TrainingListener listener) {
-        synchronized (listeners) {
-            if (!listeners.contains(listener)) {
-                listeners.add(listener);
-                Log.d(TAG, "TrainingListener added");
-            }
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+            Log.d(TAG, "TrainingListener added");
         }
     }
     
     public void removeTrainingListener(TrainingListener listener) {
-        synchronized (listeners) {
-            listeners.remove(listener);
-            Log.d(TAG, "TrainingListener removed");
-        }
+        listeners.remove(listener);
+        Log.d(TAG, "TrainingListener removed");
     }
     
     public void setLearningRate(float rate) {
@@ -114,19 +74,15 @@ public class NeuralNetworkTrainer {
     }
     
     public void trainNetwork(List<TrainingData> trainingData, String modelType) {
-        synchronized (trainingLock) {
-            if (isTraining) {
-                Log.w(TAG, "Training already in progress");
-                return;
-            }
-            
-            if (trainingData == null || trainingData.isEmpty()) {
-                Log.e(TAG, "No training data provided");
-                notifyTrainingFailed(new IllegalArgumentException("No training data"));
-                return;
-            }
-            
-            isTraining = true;
+        if (isTraining) {
+            Log.w(TAG, "Training already in progress");
+            return;
+        }
+        
+        if (trainingData == null || trainingData.isEmpty()) {
+            Log.e(TAG, "No training data provided");
+            notifyTrainingFailed(new IllegalArgumentException("No training data"));
+            return;
         }
         
         trainingExecutor.execute(() -> {
@@ -135,10 +91,6 @@ public class NeuralNetworkTrainer {
             } catch (Exception e) {
                 Log.e(TAG, "Training failed", e);
                 notifyTrainingFailed(e);
-            } finally {
-                synchronized (trainingLock) {
-                    isTraining = false;
-                }
             }
         });
     }
@@ -318,50 +270,6 @@ public class NeuralNetworkTrainer {
         return epochs;
     }
     
-    public void startTraining(TrainingCallback callback) {
-        if (isTraining) {
-            Log.w(TAG, "Training already in progress");
-            callback.onTrainingError("Training already in progress");
-            return;
-        }
-        
-        trainingExecutor.execute(() -> {
-            try {
-                isTraining = true;
-                
-                // Simulate training process
-                for (int epoch = 0; epoch < epochs && isTraining; epoch++) {
-                    // Simulate epoch processing
-                    Thread.sleep(100); // Simulate computation time
-                    
-                    float simulatedLoss = 1.0f - (epoch / (float) epochs) + (float)(Math.random() * 0.1);
-                    callback.onEpochComplete(epoch + 1, simulatedLoss);
-                    
-                    // Check if training should stop
-                    if (!isTraining) {
-                        callback.onTrainingError("Training stopped by user");
-                        return;
-                    }
-                }
-                
-                isTraining = false;
-                callback.onTrainingComplete();
-                Log.d(TAG, "Training completed successfully");
-                
-            } catch (Exception e) {
-                isTraining = false;
-                Log.e(TAG, "Training failed", e);
-                callback.onTrainingError(e.getMessage());
-            }
-        });
-    }
-    
-    public void saveModel(String modelName) {
-        Log.d(TAG, "Saving model: " + modelName);
-        // Model saving logic would go here
-        // For now, just log the save operation
-    }
-
     public void stopTraining() {
         if (isTraining) {
             isTraining = false;

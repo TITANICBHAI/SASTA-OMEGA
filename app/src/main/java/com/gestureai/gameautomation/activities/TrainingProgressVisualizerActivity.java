@@ -57,9 +57,6 @@ public class TrainingProgressVisualizerActivity extends AppCompatActivity {
     private boolean isTraining = false;
     private long trainingStartTime;
     
-    // Critical: Memory leak prevention
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,11 +120,11 @@ public class TrainingProgressVisualizerActivity extends AppCompatActivity {
     }
     
     private void setupUpdateLoop() {
-        updateHandler = new Handler(android.os.Looper.getMainLooper());
+        updateHandler = new Handler();
         updateRunnable = new Runnable() {
             @Override
             public void run() {
-                if (!isDestroyed.get() && isTraining) {
+                if (isTraining) {
                     updateTrainingMetrics();
                     updateHandler.postDelayed(this, 2000); // Update every 2 seconds
                 }
@@ -143,21 +140,13 @@ public class TrainingProgressVisualizerActivity extends AppCompatActivity {
         btnPauseTraining.setEnabled(true);
         btnStopTraining.setEnabled(true);
         
-        // Start training on background thread with proper lifecycle management
+        // Start training on background thread
         new Thread(() -> {
             try {
                 performModelTraining();
             } catch (Exception e) {
                 android.util.Log.e(TAG, "Training error", e);
-                // Use weak reference to prevent activity retention
-                java.lang.ref.WeakReference<TrainingProgressVisualizerActivity> activityRef = 
-                    new java.lang.ref.WeakReference<>(TrainingProgressVisualizerActivity.this);
-                runOnUiThread(() -> {
-                    TrainingProgressVisualizerActivity activity = activityRef.get();
-                    if (activity != null && !activity.isDestroyed()) {
-                        activity.stopTraining();
-                    }
-                });
+                runOnUiThread(() -> stopTraining());
             }
         }).start();
         
@@ -334,32 +323,8 @@ public class TrainingProgressVisualizerActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
         isTraining = false;
-        
-        // Clean up handler and runnables
-        if (updateHandler != null) {
-            updateHandler.removeCallbacksAndMessages(null);
-            if (updateRunnable != null) {
-                updateHandler.removeCallbacks(updateRunnable);
-                updateRunnable = null;
-            }
-            updateHandler = null;
-        }
-        
-        // Clean up AI components to prevent memory leaks
-        mlModelManager = null;
-        gameStrategyAgent = null;
-        dqnAgent = null;
-        ppoAgent = null;
-        
-        // Clear adapter and data references
-        comparisonAdapter = null;
-        trainingHistory = null;
-        
-        android.util.Log.d(TAG, "TrainingProgressVisualizerActivity destroyed - memory cleaned up");
+        updateHandler.removeCallbacks(updateRunnable);
     }
     
     // Training metrics data class

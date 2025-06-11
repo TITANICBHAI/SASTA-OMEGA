@@ -35,8 +35,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 
 public class ScreenCaptureService extends Service {
     private static final String TAG = "ScreenCaptureService";
-    private static volatile ScreenCaptureService instance;
-    private static final Object instanceLock = new Object();
     private static final String CHANNEL_ID = "ScreenCaptureChannel";
     private static final int NOTIFICATION_ID = 1001;
     
@@ -69,53 +67,14 @@ public class ScreenCaptureService extends Service {
     private ScreenCaptureCallback callback;
     private boolean isCapturing = false;
     
-    // MediaProjection lifecycle management with strict validation
-    private volatile boolean projectionActive = false;
-    private volatile long projectionStartTime = 0;
-    private static final long PROJECTION_TIMEOUT_MS = 300000; // 5 minutes
-    private final Object projectionLock = new Object();
-    private volatile boolean serviceDestroyed = false;
-    private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
-    private Runnable projectionTimeoutRunnable;
-    
-    // Frame buffer management with memory limits
-    private static final int MAX_FRAME_BUFFER_SIZE = 10;
-    private final java.util.concurrent.ConcurrentLinkedQueue<Bitmap> frameBuffer = new java.util.concurrent.ConcurrentLinkedQueue<>();
-    private final java.util.concurrent.atomic.AtomicInteger frameBufferSize = new java.util.concurrent.atomic.AtomicInteger(0);
-    private volatile boolean memoryPressureDetected = false;
-    
     // Screen dimensions
     private int screenWidth;
     private int screenHeight;
     private int screenDensity;
     
-    // Thread-safe singleton methods
-    public static ScreenCaptureService getInstance() {
-        return instance;
-    }
-    
-    public static ScreenCaptureService getInstanceSafe() {
-        synchronized (instanceLock) {
-            if (instance == null) {
-                Log.w(TAG, "ScreenCaptureService instance not yet created");
-                return null;
-            }
-            return instance;
-        }
-    }
-    
-    public static boolean isInstanceAvailable() {
-        synchronized (instanceLock) {
-            return instance != null;
-        }
-    }
-    
     @Override
     public void onCreate() {
         super.onCreate();
-        synchronized (instanceLock) {
-            instance = this;
-        }
         createNotificationChannel();
         
         mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
@@ -195,184 +154,30 @@ public class ScreenCaptureService extends Service {
     }
     
     public boolean startCapture(Intent mediaProjectionData) {
-        synchronized (projectionLock) {
-            if (serviceDestroyed) {
-                Log.w(TAG, "Service destroyed, cannot start capture");
-                return false;
-            }
-            
-            if (isCapturing) {
-                Log.w(TAG, "Screen capture already in progress");
-                return true;
-            }
-            
-            try {
-                // Validate projection timeout
-                if (projectionActive && (System.currentTimeMillis() - projectionStartTime) > PROJECTION_TIMEOUT_MS) {
-                    Log.w(TAG, "Previous projection timed out, cleaning up");
-                    stopCaptureInternal();
-                }
-                
-                // Create MediaProjection with lifecycle validation
-                mediaProjection = mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, mediaProjectionData);
-                
-                if (mediaProjection == null) {
-                    Log.e(TAG, "Failed to create MediaProjection");
-                    return false;
-                }
-                
-                // Set up projection timeout monitoring
-                projectionStartTime = System.currentTimeMillis();
-                projectionActive = true;
-                
-                projectionTimeoutRunnable = () -> {
-                    Log.w(TAG, "MediaProjection timeout reached, stopping capture");
-                    stopCapture();
-                };
-                timeoutHandler.postDelayed(projectionTimeoutRunnable, PROJECTION_TIMEOUT_MS);
-                
-                // Add callback for projection termination
-                mediaProjection.registerCallback(new MediaProjection.Callback() {
-                    @Override
-                    public void onStop() {
-                        Log.d(TAG, "MediaProjection stopped by system");
-                        stopCaptureInternal();
-                    }
-                }, null);
-                
-                setupImageReader();
-                createVirtualDisplay();
-                isCapturing = true;
-                
-                Log.d(TAG, "Screen capture started successfully with lifecycle management");
-                return true;
-                
-            } catch (SecurityException e) {
-                Log.e(TAG, "Security exception starting screen capture", e);
-                projectionActive = false;
-                return false;
-            } catch (Exception e) {
-                Log.e(TAG, "Error starting screen capture", e);
-                projectionActive = false;
-                return false;
-            }
+        if (isCapturing) {
+            Log.w(TAG, "Screen capture already in progress");
+            return true;
         }
-    }
-    
-    private void processScreenWithRealTimeLearning(Bitmap bitmap) {
-        if (!learningEnabled || bitmap == null) return;
         
         try {
-            // Real-time AI processing
-            if (aiProcessingEnabled && aiProcessor != null) {
-                // Process with GameStrategyAgent
-                aiProcessor.processGameState(bitmap);
+            // Create MediaProjection from the permission result
+            mediaProjection = mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, mediaProjectionData);
+            
+            if (mediaProjection == null) {
+                Log.e(TAG, "Failed to create MediaProjection");
+                return false;
             }
             
-            // DQN learning
-            if (dqnAgent != null && previousFrame != null) {
-                float[] currentState = extractGameState(bitmap);
-                if (previousGameState != null) {
-                    float reward = calculateReward(bitmap, previousFrame);
-                    dqnAgent.learn(previousGameState, 0, reward, currentState, false);
-                }
-                previousGameState = currentState;
-            }
+            setupImageReader();
+            createVirtualDisplay();
+            isCapturing = true;
             
-            // PPO learning
-            if (ppoAgent != null && previousFrame != null) {
-                float[] gameState = extractGameState(bitmap);
-                ppoAgent.processExperience(gameState);
-            }
+            Log.d(TAG, "Screen capture started successfully");
+            return true;
             
-            // Object detection learning
-            if (objectDetector != null) {
-                objectDetector.detectObjects(bitmap);
-            }
-            
-            previousFrame = bitmap.copy(bitmap.getConfig(), false);
         } catch (Exception e) {
-            Log.e(TAG, "Error in real-time learning", e);
-        }
-    }
-    
-    private void processScreenWithAI(Bitmap bitmap) {
-        if (!aiProcessingEnabled || bitmap == null) return;
-        
-        try {
-            // ND4J processing if enabled
-            if (nd4jProcessingEnabled) {
-                INDArray imageArray = bitmapToINDArray(bitmap);
-                if (imageArray != null) {
-                    // Process with neural networks
-                    patternLearner.analyzePattern(imageArray);
-                }
-            }
-            
-            // Pattern learning
-            if (patternLearner != null) {
-                patternLearner.processFrame(bitmap);
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error in AI processing", e);
-        }
-    }
-    
-    private float[] extractGameState(Bitmap bitmap) {
-        // Extract 128-dimensional game state from bitmap
-        float[] state = new float[128];
-        try {
-            // Simple feature extraction - convert bitmap to normalized features
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            
-            // Sample pixels at regular intervals
-            int sampleStep = Math.max(1, width / 16); // 16x8 grid = 128 features
-            int index = 0;
-            
-            for (int y = 0; y < height && index < 128; y += height / 8) {
-                for (int x = 0; x < width && index < 128; x += sampleStep) {
-                    int pixel = bitmap.getPixel(x, y);
-                    // Convert to grayscale and normalize
-                    int gray = (((pixel >> 16) & 0xFF) + ((pixel >> 8) & 0xFF) + (pixel & 0xFF)) / 3;
-                    state[index++] = gray / 255.0f;
-                }
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error extracting game state", e);
-        }
-        return state;
-    }
-    
-    private float calculateReward(Bitmap current, Bitmap previous) {
-        // Simple reward calculation based on visual changes
-        try {
-            // Compare histograms or key regions
-            return 0.1f; // Placeholder - implement game-specific reward logic
-        } catch (Exception e) {
-            Log.e(TAG, "Error calculating reward", e);
-            return 0.0f;
-        }
-    }
-    
-    private INDArray bitmapToINDArray(Bitmap bitmap) {
-        try {
-            int width = bitmap.getWidth();
-            int height = bitmap.getHeight();
-            float[][][] imageArray = new float[1][height][width];
-            
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int pixel = bitmap.getPixel(x, y);
-                    int gray = (((pixel >> 16) & 0xFF) + ((pixel >> 8) & 0xFF) + (pixel & 0xFF)) / 3;
-                    imageArray[0][y][x] = gray / 255.0f;
-                }
-            }
-            
-            return Nd4j.create(imageArray);
-        } catch (Exception e) {
-            Log.e(TAG, "Error converting bitmap to INDArray", e);
-            return null;
+            Log.e(TAG, "Error starting screen capture", e);
+            return false;
         }
     }
     
@@ -401,183 +206,6 @@ public class ScreenCaptureService extends Service {
         }
         
         return null;
-    }
-    
-    public void stopCapture() {
-        synchronized (projectionLock) {
-            if (!isCapturing && !projectionActive) {
-                Log.w(TAG, "Screen capture not active");
-                return;
-            }
-            
-            stopScreenCaptureInternal();
-        }
-    }
-    
-    private void stopScreenCaptureInternal() {
-        try {
-            isCapturing = false;
-            projectionActive = false;
-            
-            // Clear frame buffer to prevent memory leaks
-            clearFrameBuffer();
-            
-            if (virtualDisplay != null) {
-                virtualDisplay.release();
-                virtualDisplay = null;
-            }
-            
-            if (imageReader != null) {
-                imageReader.close();
-                imageReader = null;
-            }
-            
-            if (mediaProjection != null) {
-                mediaProjection.stop();
-                mediaProjection = null;
-            }
-            
-            Log.d(TAG, "Screen capture stopped successfully with cleanup");
-        } catch (Exception e) {
-            Log.e(TAG, "Error stopping screen capture", e);
-        }
-    }
-    
-    private void clearFrameBuffer() {
-        try {
-            while (!frameBuffer.isEmpty()) {
-                Bitmap frame = frameBuffer.poll();
-                if (frame != null && !frame.isRecycled()) {
-                    frame.recycle();
-                }
-            }
-            frameBufferSize.set(0);
-            memoryPressureDetected = false;
-            Log.d(TAG, "Frame buffer cleared");
-        } catch (Exception e) {
-            Log.e(TAG, "Error clearing frame buffer", e);
-        }
-    }
-    
-    private void addToFrameBuffer(Bitmap bitmap) {
-        if (bitmap == null) return;
-        
-        try {
-            // Check memory pressure
-            Runtime runtime = Runtime.getRuntime();
-            long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-            long maxMemory = runtime.maxMemory();
-            double memoryUsage = (double) usedMemory / maxMemory;
-            
-            if (memoryUsage > 0.8) {
-                memoryPressureDetected = true;
-                // Drop older frames under memory pressure
-                while (frameBufferSize.get() > MAX_FRAME_BUFFER_SIZE / 2) {
-                    Bitmap oldFrame = frameBuffer.poll();
-                    if (oldFrame != null && !oldFrame.isRecycled()) {
-                        oldFrame.recycle();
-                    }
-                    frameBufferSize.decrementAndGet();
-                }
-                Log.w(TAG, "Memory pressure detected, dropping frames");
-            }
-            
-            // Add new frame if buffer not full
-            if (frameBufferSize.get() < MAX_FRAME_BUFFER_SIZE) {
-                frameBuffer.offer(bitmap.copy(bitmap.getConfig(), false));
-                frameBufferSize.incrementAndGet();
-            } else {
-                // Remove oldest frame and add new one
-                Bitmap oldFrame = frameBuffer.poll();
-                if (oldFrame != null && !oldFrame.isRecycled()) {
-                    oldFrame.recycle();
-                }
-                frameBuffer.offer(bitmap.copy(bitmap.getConfig(), false));
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error managing frame buffer", e);
-        }
-    }
-    
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        stopCapture();
-        
-        // Cleanup MediaProjection resources
-        try {
-            if (virtualDisplay != null) {
-                virtualDisplay.release();
-                virtualDisplay = null;
-            }
-            if (imageReader != null) {
-                imageReader.close();
-                imageReader = null;
-            }
-            if (mediaProjection != null) {
-                mediaProjection.stop();
-                mediaProjection = null;
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error cleaning up MediaProjection resources", e);
-        }
-        
-        // Cleanup AI components
-        try {
-            if (aiProcessor != null) {
-                aiProcessor.cleanup();
-            }
-            if (patternLearner != null) {
-                patternLearner.cleanup();
-            }
-            if (dqnAgent != null) {
-                dqnAgent.cleanup();
-            }
-            if (ppoAgent != null) {
-                ppoAgent.cleanup();
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error cleaning up AI components", e);
-        }
-        
-        instance = null;
-        Log.d(TAG, "ScreenCaptureService destroyed");
-    }
-    
-    @Nullable
-    // Service Binder for client communication
-    public class ScreenCaptureBinder extends android.os.Binder {
-        public ScreenCaptureService getService() {
-            return ScreenCaptureService.this;
-        }
-        
-        public boolean startCapture(int resultCode, Intent data, ScreenCaptureCallback callback) {
-            return ScreenCaptureService.this.startCapture(resultCode, data, callback);
-        }
-        
-        public void stopCapture() {
-            ScreenCaptureService.this.stopCapture();
-        }
-        
-        public boolean isCapturing() {
-            return ScreenCaptureService.this.isCapturing;
-        }
-        
-        public Bitmap captureScreen() {
-            return ScreenCaptureService.this.captureScreen();
-        }
-    }
-    
-    private final IBinder binder = new ScreenCaptureBinder();
-    
-    @Override
-    public IBinder onBind(Intent intent) {
-        Log.d(TAG, "Service bound to client");
-        return binder;
-    }
-    
-    public static ScreenCaptureService getInstance() {
-        return instance;
     }
     
     private void setupImageReader() {
@@ -740,16 +368,42 @@ public class ScreenCaptureService extends Service {
         Log.d(TAG, "Screen Capture Service destroyed");
     }
     
-    private void scheduleContinuousCapture() {
-        if (isCapturing && captureHandler != null) {
-            captureHandler.postDelayed(new Runnable() {
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null; // Not a bound service
+    }
+}
+            imageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() {
                 @Override
-                public void run() {
-                    if (isCapturing) {
-                        scheduleContinuousCapture();
-                    }
+                public void onImageAvailable(ImageReader reader) {
+                    processNewImage(reader);
                 }
-            }, 16); // ~60 FPS
+            }, captureHandler);
+            
+            // Create virtual display
+            virtualDisplay = mediaProjection.createVirtualDisplay(
+                "GameAutomationCapture",
+                screenWidth, screenHeight, screenDensity,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                imageReader.getSurface(),
+                null, null
+            );
+            
+            isCapturing = true;
+            Log.d(TAG, "Screen capture started successfully");
+            
+            // Start continuous capture
+            scheduleContinuousCapture();
+            
+            return true;
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting screen capture", e);
+            if (callback != null) {
+                callback.onCaptureError("Error starting capture: " + e.getMessage());
+            }
+            return false;
         }
     }
 
@@ -786,9 +440,7 @@ public class ScreenCaptureService extends Service {
                 processWithND4J(bitmap);
             } else {
                 // Original processing
-                if (patternLearner != null) {
-                    patternLearner.learnFromScreen(bitmap);
-                }
+                patternLearner.learnFromScreen(bitmap);
             }
             Log.d(TAG, "AI processed screen capture");
         } catch (Exception e) {
@@ -890,6 +542,12 @@ public class ScreenCaptureService extends Service {
     
     public boolean isCapturing() {
         return isCapturing;
+    }
+    
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
     
     /**

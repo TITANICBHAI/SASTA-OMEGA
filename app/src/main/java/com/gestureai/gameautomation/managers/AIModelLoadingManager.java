@@ -34,7 +34,7 @@ public class AIModelLoadingManager {
     private AIModelLoadingManager(Context context) {
         this.context = context.getApplicationContext();
         this.modelStates = new HashMap<>();
-        this.modelLoadingExecutor = Executors.newFixedThreadPool(2); // Fixed pool to prevent thread exhaustion
+        this.modelLoadingExecutor = Executors.newCachedThreadPool();
         initializeModelStates();
     }
     
@@ -60,63 +60,17 @@ public class AIModelLoadingManager {
     public Future<?> loadAllModelsAsync() {
         return modelLoadingExecutor.submit(() -> {
             try {
-                // Check memory before loading models to prevent OOM
-                checkMemoryAvailability();
-                
-                // Load models with version compatibility checks
                 loadTensorFlowLiteModel();
-                checkMemoryPressure(); // Check after each model
-                
                 loadMediaPipeModel();
-                checkMemoryPressure();
-                
                 loadMLKitModel();
-                checkMemoryPressure();
-                
                 loadDQNModel();
-                checkMemoryPressure();
-                
                 loadPPOModel();
                 
                 Log.d(TAG, "All AI models loaded successfully");
-            } catch (OutOfMemoryError e) {
-                Log.e(TAG, "Out of memory loading models, unloading non-essential models", e);
-                emergencyUnloadModels();
             } catch (Exception e) {
                 Log.e(TAG, "Error loading AI models", e);
             }
         });
-    }
-    
-    private void checkMemoryAvailability() throws Exception {
-        Runtime runtime = Runtime.getRuntime();
-        long maxMemory = runtime.maxMemory();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        long availableMemory = maxMemory - usedMemory;
-        
-        if (availableMemory < 50 * 1024 * 1024) { // Less than 50MB available
-            throw new Exception("Insufficient memory for model loading: " + (availableMemory / 1024 / 1024) + "MB available");
-        }
-    }
-    
-    private void checkMemoryPressure() {
-        Runtime runtime = Runtime.getRuntime();
-        long maxMemory = runtime.maxMemory();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        float memoryUsagePercent = (float) usedMemory / maxMemory;
-        
-        if (memoryUsagePercent > 0.8f) {
-            Log.w(TAG, "Memory usage high: " + (memoryUsagePercent * 100) + "%, triggering GC");
-            System.gc();
-        }
-    }
-    
-    private void emergencyUnloadModels() {
-        // Unload non-essential models to free memory
-        updateModelState("DQN_GameStrategy", ModelState.NOT_LOADED);
-        updateModelState("PPO_ActionOptimization", ModelState.NOT_LOADED);
-        System.gc();
-        Log.w(TAG, "Emergency model unload completed");
     }
     
     private void loadTensorFlowLiteModel() {
@@ -128,21 +82,14 @@ public class AIModelLoadingManager {
             // Simulate model loading with fallback mechanism
             Thread.sleep(1000); // Simulated loading time
             
-            // Check if TensorFlow Lite is available with graceful fallback
+            // Check if TensorFlow Lite is available
             try {
                 Class.forName("org.tensorflow.lite.Interpreter");
-                // Verify actual model loading capability
-                if (verifyTensorFlowLiteCapability()) {
-                    updateModelState(modelName, ModelState.LOADED);
-                    notifyLoadingCompleted(modelName);
-                    Log.d(TAG, "TensorFlow Lite model loaded successfully");
-                } else {
-                    throw new Exception("TensorFlow Lite interpreter not functional");
-                }
-            } catch (ClassNotFoundException e) {
-                Log.w(TAG, "TensorFlow Lite not available, using fallback processing");
-                updateModelState(modelName, ModelState.FALLBACK);
+                updateModelState(modelName, ModelState.LOADED);
                 notifyLoadingCompleted(modelName);
+                Log.d(TAG, "TensorFlow Lite model loaded successfully");
+            } catch (ClassNotFoundException e) {
+                throw new Exception("TensorFlow Lite not available", e);
             }
             
         } catch (Exception e) {
@@ -160,20 +107,14 @@ public class AIModelLoadingManager {
             
             Thread.sleep(800);
             
-            // Check MediaPipe availability with graceful fallback
+            // Check MediaPipe availability with fallback
             try {
                 Class.forName("com.google.mediapipe.solutions.hands.Hands");
-                if (verifyMediaPipeCapability()) {
-                    updateModelState(modelName, ModelState.LOADED);
-                    notifyLoadingCompleted(modelName);
-                    Log.d(TAG, "MediaPipe hand tracking model loaded successfully");
-                } else {
-                    throw new Exception("MediaPipe hands solution not functional");
-                }
-            } catch (ClassNotFoundException e) {
-                Log.w(TAG, "MediaPipe not available, using OpenCV fallback");
-                updateModelState(modelName, ModelState.FALLBACK);
+                updateModelState(modelName, ModelState.LOADED);
                 notifyLoadingCompleted(modelName);
+                Log.d(TAG, "MediaPipe hand tracking model loaded successfully");
+            } catch (ClassNotFoundException e) {
+                throw new Exception("MediaPipe not available", e);
             }
             
         } catch (Exception e) {
@@ -280,37 +221,11 @@ public class AIModelLoadingManager {
     
     public boolean areAllModelsLoaded() {
         for (ModelState state : modelStates.values()) {
-            if (state != ModelState.LOADED && state != ModelState.FALLBACK) {
+            if (state != ModelState.LOADED) {
                 return false;
             }
         }
         return true;
-    }
-    
-    /**
-     * Verify TensorFlow Lite capability without causing ClassNotFoundException
-     */
-    private boolean verifyTensorFlowLiteCapability() {
-        try {
-            // Basic capability check without instantiating complex objects
-            return true; // Simplified verification for now
-        } catch (Exception e) {
-            Log.w(TAG, "TensorFlow Lite verification failed: " + e.getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Verify MediaPipe capability without causing ClassNotFoundException
-     */
-    private boolean verifyMediaPipeCapability() {
-        try {
-            // Basic capability check without instantiating complex objects
-            return true; // Simplified verification for now
-        } catch (Exception e) {
-            Log.w(TAG, "MediaPipe verification failed: " + e.getMessage());
-            return false;
-        }
     }
     
     public void cleanup() {

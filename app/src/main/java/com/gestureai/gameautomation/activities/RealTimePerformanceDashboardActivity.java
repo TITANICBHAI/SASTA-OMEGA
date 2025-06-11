@@ -47,9 +47,6 @@ public class RealTimePerformanceDashboardActivity extends AppCompatActivity {
     private List<PerformanceSnapshot> performanceHistory;
     private boolean isMonitoring = false;
     
-    // Critical: Memory leak prevention
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,17 +101,6 @@ public class RealTimePerformanceDashboardActivity extends AppCompatActivity {
         isMonitoring = true;
         performanceTracker.startMonitoring();
         resourceMonitor.startMonitoring();
-        
-        // Critical: Use weak reference to prevent activity retention
-        updateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!isDestroyed.get() && isMonitoring) {
-                    updatePerformanceMetrics();
-                    updateHandler.postDelayed(this, 1000); // Update every second
-                }
-            }
-        };
         updateHandler.post(updateRunnable);
     }
     
@@ -179,36 +165,14 @@ public class RealTimePerformanceDashboardActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
         isMonitoring = false;
-        
-        // Clean up handler and runnables
-        if (updateHandler != null) {
-            updateHandler.removeCallbacksAndMessages(null);
-            if (updateRunnable != null) {
-                updateHandler.removeCallbacks(updateRunnable);
-                updateRunnable = null;
-            }
-            updateHandler = null;
-        }
-        
-        // Stop monitoring components
+        updateHandler.removeCallbacks(updateRunnable);
         if (performanceTracker != null) {
             performanceTracker.stopMonitoring();
-            performanceTracker = null;
         }
         if (resourceMonitor != null) {
             resourceMonitor.stopMonitoring();
-            resourceMonitor = null;
         }
-        
-        // Clear adapter and data references
-        adapter = null;
-        performanceHistory = null;
-        
-        android.util.Log.d(TAG, "RealTimePerformanceDashboardActivity destroyed - memory cleaned up");
     }
     
     // Performance snapshot data class

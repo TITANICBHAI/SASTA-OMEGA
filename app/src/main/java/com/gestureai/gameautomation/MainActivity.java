@@ -20,8 +20,16 @@ import android.view.MenuItem;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.gestureai.gameautomation.fragments.*;
+import com.gestureai.gameautomation.fragments.SettingsFragment;
 import androidx.fragment.app.FragmentTransaction;
+import com.gestureai.gameautomation.fragments.AnalyticsFragment;
+import com.gestureai.gameautomation.fragments.AutoPlayFragment;
+import com.gestureai.gameautomation.fragments.GestureControllerFragment;
+import com.gestureai.gameautomation.fragments.ScreenMonitorFragment;
+import com.gestureai.gameautomation.fragments.TrainingFragment;
+import com.gestureai.gameautomation.fragments.DebugFragment;
+import com.gestureai.gameautomation.fragments.MoreFragment;
+import com.gestureai.gameautomation.fragments.PerformanceFragment;
 import com.gestureai.gameautomation.services.TouchAutomationService;
 import com.gestureai.gameautomation.utils.NLPProcessor;
 import com.gestureai.gameautomation.utils.OpenCVHelper;
@@ -36,13 +44,6 @@ import com.gestureai.gameautomation.managers.AIModelLoadingManager;
 import com.gestureai.gameautomation.managers.DatabaseUIManager;
 import com.gestureai.gameautomation.managers.ServiceIntegrationManager;
 import com.gestureai.gameautomation.managers.AIStackManager;
-import com.gestureai.gameautomation.utils.ServiceStartupCoordinator;
-import com.gestureai.gameautomation.utils.MemoryManager;
-import com.gestureai.gameautomation.utils.ErrorRecoveryManager;
-import com.gestureai.gameautomation.utils.AIComponentSynchronizer;
-import com.gestureai.gameautomation.database.DatabaseIntegrationManager;
-import com.gestureai.gameautomation.activities.SetupWizardActivity;
-import com.gestureai.gameautomation.utils.ComprehensiveErrorRecovery;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.view.Menu;
@@ -58,9 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ACCESSIBILITY_PERMISSION = 1001;
     private static final int REQUEST_OVERLAY_PERMISSION = 1002;
     private static final int REQUEST_SCREENSHOT_SELECTION = 1003;
-    
-    // Static instance for broadcast receiver access
-    private static MainActivity currentInstance;
     
     private ObjectDetectionEngine detectionEngine;
     private NLPProcessor nlpProcessor;
@@ -102,11 +100,6 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseUIManager databaseUIManager;
     private ServiceIntegrationManager serviceIntegrationManager;
     private AIStackManager aiStackManager;
-    private ServiceStartupCoordinator serviceCoordinator;
-    private MemoryManager memoryManager;
-    private ErrorRecoveryManager errorRecovery;
-    private AIComponentSynchronizer aiSynchronizer;
-    private DatabaseIntegrationManager databaseIntegration;
     
     private boolean isAutomationActive = false;
     private boolean permissionsGranted = false;
@@ -114,13 +107,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        // Check if setup is completed
-        if (!SetupWizardActivity.isSetupCompleted(this)) {
-            startSetupWizard();
-            return;
-        }
-        
         setContentView(R.layout.activity_main);
         
         initializeUI();
@@ -129,265 +115,20 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
         setupBottomNavigation();
         setupManagerListeners();
-        setupErrorRecovery();
 
         Log.d(TAG, "MainActivity created with comprehensive backend integration");
-        
-        // Show default fragment
-        showFragment(0);
-    }
-    
-    private void startSetupWizard() {
-        Intent intent = new Intent(this, SetupWizardActivity.class);
-        startActivity(intent);
-        finish();
-    }
-    
-    // CRITICAL: Fragment switching method implementation with crash protection
-    private void showFragment(int position) {
-        Fragment selectedFragment = null;
-        String fragmentTag = "fragment_" + position;
-        
-        try {
-            // Check if activity is finishing or fragment manager is not available
-            if (isFinishing() || isDestroyed() || getSupportFragmentManager().isStateSaved()) {
-                Log.w(TAG, "Cannot switch fragments - activity finishing or state saved");
-                return;
-            }
-            
-            switch (position) {
-                case 0:
-                    selectedFragment = new DashboardFragment();
-                    break;
-                case 1:
-                    selectedFragment = new AutoPlayFragment();
-                    break;
-                case 2:
-                    selectedFragment = new AIFragment();
-                    break;
-                case 3:
-                    selectedFragment = new ToolsFragment();
-                    break;
-                case 4:
-                    selectedFragment = new MoreFragment();
-                    break;
-                default:
-                    selectedFragment = new DashboardFragment();
-                    break;
-            }
-            
-            if (selectedFragment != null) {
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, selectedFragment, fragmentTag);
-                transaction.commitAllowingStateLoss(); // Use commitAllowingStateLoss for crash protection
-                
-                currentFragment = selectedFragment;
-                Log.d(TAG, "Fragment switched to position: " + position);
-            }
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error switching fragments", e);
-            ComprehensiveErrorRecovery.getInstance().reportError("MainActivity", e, 
-                ComprehensiveErrorRecovery.ErrorType.MODERATE);
-        }
-    }
-    
-    // Public method for external fragment switching
-    public void switchToFragment(int position) {
-        showFragment(position);
-        if (bottomNavigationView != null) {
-            bottomNavigationView.setSelectedItemId(getMenuIdForPosition(position));
-        }
-    }
-    
-    // Overloaded method for direct fragment switching
-    public void switchToFragment(Fragment fragment) {
-        try {
-            if (isFinishing() || isDestroyed() || getSupportFragmentManager().isStateSaved()) {
-                Log.w(TAG, "Cannot switch fragments - activity finishing or state saved");
-                return;
-            }
-            
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
-            transaction.commitAllowingStateLoss();
-            
-            currentFragment = fragment;
-            Log.d(TAG, "Fragment switched to: " + fragment.getClass().getSimpleName());
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error switching to fragment", e);
-            ComprehensiveErrorRecovery.getInstance().reportError("MainActivity", e, 
-                ComprehensiveErrorRecovery.ErrorType.MODERATE);
-        }
-    }
-    
-    // Method called by DashboardFragment
-    public void navigateToFragment(String position) {
-        try {
-            int pos = Integer.parseInt(position);
-            switchToFragment(pos);
-        } catch (NumberFormatException e) {
-            Log.e(TAG, "Invalid fragment position: " + position, e);
-            switchToFragment(0); // Default to dashboard
-        }
-    }
-    
-    private int getMenuIdForPosition(int position) {
-        switch (position) {
-            case 0: return R.id.nav_dashboard;
-            case 1: return R.id.nav_autoplay;
-            case 2: return R.id.nav_ai;
-            case 3: return R.id.nav_tools;
-            case 4: return R.id.nav_more;
-            default: return R.id.nav_dashboard;
-        }
     }
     
     private void initializeBackendManagers() {
         try {
-            // Initialize error recovery first
-            ComprehensiveErrorRecovery.getInstance().initialize(this);
-            
-            // Initialize core managers with proper error handling
+            // Initialize service connection manager
             serviceConnectionManager = ServiceConnectionManager.getInstance(this);
-            fragmentNavigationManager = new FragmentNavigationManager(this);
-            aiModelLoadingManager = new AIModelLoadingManager(this);
-            databaseUIManager = new DatabaseUIManager(this);
-            serviceIntegrationManager = new ServiceIntegrationManager(this);
-            aiStackManager = AIStackManager.getInstance(this);
-            
-            // Initialize utility coordinators
-            serviceCoordinator = new ServiceStartupCoordinator(this);
-            memoryManager = new MemoryManager();
-            errorRecovery = new ErrorRecoveryManager(this);
-            aiSynchronizer = new AIComponentSynchronizer();
-            databaseIntegration = new DatabaseIntegrationManager(this);
-            
-            Log.d(TAG, "Backend managers initialized successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize backend managers", e);
-            ComprehensiveErrorRecovery.getInstance().reportError("MainActivity", e, 
-                ComprehensiveErrorRecovery.ErrorType.CRITICAL);
-        }
-    }
-    
-    private void initializeUI() {
-        try {
-            // Initialize UI components safely
-            bottomNavigationView = findViewById(R.id.bottom_navigation);
-            switchND4J = findViewById(R.id.switch_nd4j);
-            tvAIStatus = findViewById(R.id.tv_ai_status);
-            
-            Log.d(TAG, "UI components initialized");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize UI", e);
-        }
-    }
-    
-    private void initializeComponents() {
-        try {
-            // Initialize core detection and processing engines
-            detectionEngine = new ObjectDetectionEngine(this);
-            nlpProcessor = new NLPProcessor(this);
-            gameTypeDetector = new GameTypeDetector();
-            
-            // Initialize AI components with error handling
-            gameStrategyAgent = new GameStrategyAgent(this);
-            adaptiveDecisionMaker = new AdaptiveDecisionMaker();
-            gameStatePredictor = new GameStatePredictor(this);
-            patternLearningEngine = new PatternLearningEngine(this);
-            reinforcementLearner = new ReinforcementLearner(this);
-            
-            // Initialize game strategies
-            multiPlayerStrategy = new MultiPlayerStrategy(this);
-            mobaStrategy = new MOBAStrategy(this);
-            fpsStrategy = new FPSStrategy(this);
-            
-            aiSystemInitialized = true;
-            Log.d(TAG, "Core components initialized successfully");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize components", e);
-            aiSystemInitialized = false;
-            ComprehensiveErrorRecovery.getInstance().reportError("MainActivity", e, 
-                ComprehensiveErrorRecovery.ErrorType.CRITICAL);
-        }
-    }
-    
-    private void checkPermissions() {
-        try {
-            PermissionManager.PermissionStatus status = PermissionManager.checkAllPermissions(this);
-            
-            if (!status.allGranted) {
-                Log.d(TAG, "Missing permissions detected, requesting...");
-                PermissionManager.requestMissingPermissions(this);
-            } else {
-                permissionsGranted = true;
-                Log.d(TAG, "All permissions granted");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error checking permissions", e);
-        }
-    }
-    
-    private void setupBottomNavigation() {
-        if (bottomNavigationView != null) {
-            bottomNavigationView.setOnItemSelectedListener(item -> {
-                int itemId = item.getItemId();
-                if (itemId == R.id.nav_dashboard) {
-                    showFragment(0);
-                    return true;
-                } else if (itemId == R.id.nav_autoplay) {
-                    showFragment(1);
-                    return true;
-                } else if (itemId == R.id.nav_ai) {
-                    showFragment(2);
-                    return true;
-                } else if (itemId == R.id.nav_tools) {
-                    showFragment(3);
-                    return true;
-                } else if (itemId == R.id.nav_more) {
-                    showFragment(4);
-                    return true;
-                }
-                return false;
-            });
-        }
-    }
-    
-    private void setupManagerListeners() {
-        // Setup listeners for manager state changes
-        if (aiStackManager != null) {
-            // AI stack state listener implementation
-        }
-        
-        if (serviceConnectionManager != null) {
-            // Service connection state listener implementation
-        }
-    }
-    
-    private void setupErrorRecovery() {
-        // Configure error recovery for this activity
-        ComprehensiveErrorRecovery.getInstance().initialize(this);
-        try {
-            // Initialize service connection manager with error handling
-            serviceConnectionManager = ServiceConnectionManager.getInstance(this);
-            if (serviceConnectionManager == null) {
-                Log.e(TAG, "Failed to initialize ServiceConnectionManager");
-                return;
-            }
             
             // Initialize fragment navigation manager
             fragmentNavigationManager = new FragmentNavigationManager(this);
             
-            // Initialize AI model loading manager with fallback
-            try {
-                aiModelLoadingManager = AIModelLoadingManager.getInstance(this);
-            } catch (Exception e) {
-                Log.e(TAG, "AI Model Loading Manager failed, using fallback", e);
-                aiModelLoadingManager = null;
-            }
+            // Initialize AI model loading manager
+            aiModelLoadingManager = AIModelLoadingManager.getInstance(this);
             
             // Initialize database UI manager
             databaseUIManager = DatabaseUIManager.getInstance(this);
@@ -395,30 +136,9 @@ public class MainActivity extends AppCompatActivity {
             // Initialize service integration manager
             serviceIntegrationManager = ServiceIntegrationManager.getInstance(this);
             
-            // Initialize service startup coordinator
-            serviceCoordinator = ServiceStartupCoordinator.getInstance(this);
-            
-            // Initialize memory manager
-            memoryManager = MemoryManager.getInstance(this);
-            setupMemoryManagement();
-            
-            // Initialize error recovery
-            errorRecovery = ErrorRecoveryManager.getInstance(this);
-            
-            // Initialize AI component synchronizer
-            aiSynchronizer = AIComponentSynchronizer.getInstance();
-            
-            // Initialize database integration
-            databaseIntegration = DatabaseIntegrationManager.getInstance(this);
-            
             // Initialize AI stack manager with ND4J toggle
-            try {
-                aiStackManager = AIStackManager.getInstance(this);
-                setupAIStackCallback();
-            } catch (Exception e) {
-                Log.e(TAG, "AI Stack Manager failed, continuing without AI", e);
-                aiStackManager = null;
-            }
+            aiStackManager = AIStackManager.getInstance(this);
+            setupAIStackCallback();
             
             Log.d(TAG, "All backend managers initialized successfully");
         } catch (Exception e) {
@@ -452,101 +172,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        
-        Log.d(TAG, "All manager listeners configured successfully");
-        
-        // Setup voice UI navigation receiver
-        setupVoiceUINavigationReceiver();
-    }
-    
-    private void initializeCockpitSystems() {
-        try {
-            // Initialize MediaPipe for gesture recognition
-            com.gestureai.gameautomation.managers.MediaPipeManager mediaPipeManager = 
-                com.gestureai.gameautomation.managers.MediaPipeManager.getInstance(this);
-            mediaPipeManager.initialize();
-            
-            // Initialize OpenCV for computer vision
-            com.gestureai.gameautomation.utils.OpenCVHelper.initOpenCV(this);
-            
-            // Initialize TensorFlow Lite helpers
-            com.gestureai.gameautomation.utils.TensorFlowLiteHelper tfHelper = 
-                new com.gestureai.gameautomation.utils.TensorFlowLiteHelper();
-            tfHelper.initializeObjectDetection(this);
-            
-            // Initialize object detection engine
-            com.gestureai.gameautomation.ObjectDetectionEngine detectionEngine = 
-                new com.gestureai.gameautomation.ObjectDetectionEngine(this);
-            
-            Log.d(TAG, "Cockpit systems initialized - Neural networks, gesture recognition, voice commands, and session analytics ready");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error initializing cockpit systems", e);
-        }
-    }
-    
-    private void setupVoiceUINavigationReceiver() {
-        android.content.BroadcastReceiver voiceNavigationReceiver = new android.content.BroadcastReceiver() {
-            @Override
-            public void onReceive(android.content.Context context, Intent intent) {
-                if ("com.gestureai.gameautomation.UI_NAVIGATION".equals(intent.getAction())) {
-                    String fragment = intent.getStringExtra("fragment");
-                    int tabIndex = intent.getIntExtra("tab_index", -1);
-                    
-                    if (tabIndex >= 0) {
-                        // Switch to the specified tab
-                        bottomNavigationView.setSelectedItemId(getMenuIdForPosition(tabIndex));
-                        showFragment(tabIndex);
-                        
-                        // If specific fragment requested, switch to it after tab change
-                        if (fragment != null && !fragment.isEmpty()) {
-                            new android.os.Handler().postDelayed(() -> {
-                                switchToSpecificFragment(fragment);
-                            }, 200);
-                        }
-                        
-                        android.widget.Toast.makeText(MainActivity.this, 
-                            "Navigated via voice to " + fragment, 
-                            android.widget.Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        };
-        
-        android.content.IntentFilter filter = new android.content.IntentFilter("com.gestureai.gameautomation.UI_NAVIGATION");
-        registerReceiver(voiceNavigationReceiver, filter);
-    }
-    
-    private void switchToSpecificFragment(String fragmentName) {
-        try {
-            androidx.fragment.app.Fragment targetFragment = null;
-            
-            switch (fragmentName) {
-                case "training":
-                    targetFragment = new com.gestureai.gameautomation.fragments.TrainingFragment();
-                    break;
-                case "object_detection":
-                    targetFragment = new com.gestureai.gameautomation.fragments.ObjectDetectionFragment();
-                    break;
-                case "session_analytics":
-                    targetFragment = new com.gestureai.gameautomation.fragments.SessionAnalyticsFragment();
-                    break;
-                case "dashboard":
-                    targetFragment = new com.gestureai.gameautomation.fragments.DashboardFragment();
-                    break;
-            }
-            
-            if (targetFragment != null) {
-                androidx.fragment.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, targetFragment, fragmentName);
-                transaction.addToBackStack(null);
-                transaction.commitAllowingStateLoss();
-                Log.d(TAG, "Voice navigation completed to: " + fragmentName);
-            }
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error switching to fragment via voice: " + fragmentName, e);
-        }
         
         // AI model loading listener
         aiModelLoadingManager.setModelLoadingListener(new AIModelLoadingManager.ModelLoadingListener() {
@@ -583,8 +208,6 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-        
-        setupDatabaseIntegration();
         
         // Database operation listener
         databaseUIManager.setDatabaseOperationListener(new DatabaseUIManager.DatabaseOperationListener() {
@@ -640,8 +263,6 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new PerformanceFragment();
             } else if (item.getItemId() == R.id.nav_debug) {
                 selectedFragment = new DebugFragment();
-            } else if (item.getItemId() == R.id.nav_ai_explainer) {
-                selectedFragment = new com.gestureai.gameautomation.fragments.AIExplainerFragment();
             } else if (item.getItemId() == R.id.nav_more) {
                 selectedFragment = new MoreFragment();
             }
@@ -664,24 +285,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Public method for fragments to switch to other fragments
     public void switchToFragment(Fragment fragment) {
-        try {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, fragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-            
-            // Update current fragment reference
-            currentFragment = fragment;
-            
-            // Update bottom navigation if needed
-            updateBottomNavigationForFragment(fragment);
-            
-            Log.d(TAG, "Fragment switched successfully: " + fragment.getClass().getSimpleName());
-        } catch (Exception e) {
-            Log.e(TAG, "Error switching to fragment: " + fragment.getClass().getSimpleName(), e);
-            ComprehensiveErrorRecovery.getInstance().reportError("MainActivity", e, 
-                ComprehensiveErrorRecovery.ErrorType.MODERATE);
-        }
+        replaceFragment(fragment);
     }
 
     
@@ -1025,26 +629,35 @@ public class MainActivity extends AppCompatActivity {
     
     private void updateStatus(String status) {
         runOnUiThread(() -> {
-            if (tvStatus != null) {
-                tvStatus.setText(status);
-            }
+            tvStatus.setText(status);
+            Log.d(TAG, "Status: " + status);
         });
-        Log.d(TAG, "Status: " + status);
     }
     
-    public void navigateToFragment(String fragmentKey) {
-        if (fragmentNavigationManager != null) {
-            boolean success = fragmentNavigationManager.navigateToFragment(fragmentKey);
-            if (!success) {
-                Log.e(TAG, "Failed to navigate to fragment: " + fragmentKey);
-                updateStatus("Navigation failed");
-            }
-        } else {
-            Log.e(TAG, "FragmentNavigationManager not initialized");
+    /**
+     * Switch to fragment - Critical method for MoreFragment navigation
+     * Fixes crash when accessing Screen Monitor or Gesture Controller from More tab
+     */
+    public void switchToFragment(Fragment fragment) {
+        try {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
+            
+            // Update current fragment reference
+            currentFragment = fragment;
+            
+            // Update bottom navigation if needed
+            updateBottomNavigationForFragment(fragment);
+            
+            Log.d(TAG, "Switched to fragment: " + fragment.getClass().getSimpleName());
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error switching to fragment", e);
+            Toast.makeText(this, "Error loading screen", Toast.LENGTH_SHORT).show();
         }
     }
-    
-
     
     private void updateBottomNavigationForFragment(Fragment fragment) {
         if (bottomNavigationView == null) return;

@@ -44,10 +44,6 @@ public class GestureSequenceBuilderActivity extends AppCompatActivity {
     // Touch automation service
     private TouchAutomationService touchService;
     
-    // Critical: Memory leak prevention
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    private final java.util.List<Thread> activeThreads = new java.util.concurrent.CopyOnWriteArrayList<>();
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -222,16 +218,13 @@ public class GestureSequenceBuilderActivity extends AppCompatActivity {
         btnPlaySequence.setEnabled(false);
         btnPlaySequence.setText("Playing...");
         
-        Thread sequenceThread = new Thread(() -> {
+        new Thread(() -> {
             try {
                 int loopCount = swLoopSequence.isChecked() ? 
                     Integer.parseInt(etLoopCount.getText().toString()) : 1;
                 
-                for (int loop = 0; loop < loopCount && !isDestroyed.get() && !Thread.currentThread().isInterrupted(); loop++) {
+                for (int loop = 0; loop < loopCount; loop++) {
                     for (GestureSequenceItem item : gestureSequence) {
-                        if (isDestroyed.get() || Thread.currentThread().isInterrupted()) {
-                            break;
-                        }
                         executeGestureItem(item);
                         
                         // Add global delay
@@ -240,27 +233,16 @@ public class GestureSequenceBuilderActivity extends AppCompatActivity {
                     }
                 }
                 
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                android.util.Log.d(TAG, "Sequence execution interrupted");
             } catch (Exception e) {
                 android.util.Log.e(TAG, "Error playing sequence", e);
             }
             
-            // Use weak reference to prevent activity retention
-            java.lang.ref.WeakReference<GestureSequenceBuilderActivity> activityRef = new java.lang.ref.WeakReference<>(GestureSequenceBuilderActivity.this);
             runOnUiThread(() -> {
-                GestureSequenceBuilderActivity activity = activityRef.get();
-                if (activity != null && !activity.isDestroyed()) {
-                    activity.btnPlaySequence.setEnabled(true);
-                    activity.btnPlaySequence.setText("Play Sequence");
-                    Toast.makeText(activity, "Sequence completed", Toast.LENGTH_SHORT).show();
-                }
+                btnPlaySequence.setEnabled(true);
+                btnPlaySequence.setText("Play Sequence");
+                Toast.makeText(this, "Sequence completed", Toast.LENGTH_SHORT).show();
             });
-        });
-        
-        activeThreads.add(sequenceThread);
-        sequenceThread.start();
+        }).start();
     }
     
     private void executeGestureItem(GestureSequenceItem item) {
@@ -390,33 +372,6 @@ public class GestureSequenceBuilderActivity extends AppCompatActivity {
         List<GestureSequenceItem> sequence = new ArrayList<>();
         // For now, return empty list - implement proper JSON parsing as needed
         return sequence;
-    }
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
-        
-        // Interrupt and clean up all active threads
-        for (Thread thread : activeThreads) {
-            if (thread != null && thread.isAlive()) {
-                thread.interrupt();
-            }
-        }
-        activeThreads.clear();
-        
-        // Clear service reference to prevent binding leaks
-        touchService = null;
-        
-        // Clear adapter and data references
-        sequenceAdapter = null;
-        libraryAdapter = null;
-        gestureSequence = null;
-        gestureLibrary = null;
-        
-        android.util.Log.d(TAG, "GestureSequenceBuilderActivity destroyed - memory cleaned up");
     }
     
     // Data classes

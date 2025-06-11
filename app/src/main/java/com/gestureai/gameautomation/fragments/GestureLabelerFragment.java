@@ -34,13 +34,6 @@ public class GestureLabelerFragment extends Fragment {
     private Button btnImportDataset;
     private RecyclerView rvLabeledObjects;
     
-    // Gesture recording components
-    private Button btnRecordGesture;
-    private Button btnSaveGesture;
-    private EditText etGestureLabel;
-    private View gestureRecordingArea;
-    private RecyclerView rvSavedGestures;
-    
     // Bounding box drawing components
     private Paint boundingBoxPaint;
     private List<LabeledObject> labeledObjects;
@@ -48,61 +41,21 @@ public class GestureLabelerFragment extends Fragment {
     private boolean isDrawingBox = false;
     private float startX, startY, endX, endY;
     
-    // Gesture recording state
-    private boolean isRecording = false;
-    private List<String> savedGestures;
-    private SavedGesturesAdapter gesturesAdapter;
-    
     // Backend integration
     private ObjectLabelerEngine labelerEngine;
     private ObjectDetectionEngine detectionEngine;
     
-    // Enhanced data structures with hierarchical classification
-    public static class LabeledObject {
+    // Data structures
+    private static class LabeledObject {
         public String name;
-        public String category;
-        public String type;
-        public String state;
-        public String context;
         public Rect boundingBox;
         public float confidence;
         
-        // Enhanced constructor
-        public LabeledObject(String name, String category, String type, String state, 
-                           String context, Rect boundingBox) {
+        public LabeledObject(String name, Rect box, float confidence) {
             this.name = name;
-            this.category = category != null ? category : "unknown";
-            this.type = type != null ? type : "default";
-            this.state = state != null ? state : "normal";
-            this.context = context != null ? context : "general";
-            this.boundingBox = boundingBox;
-            this.confidence = 1.0f;
+            this.boundingBox = box;
+            this.confidence = confidence;
         }
-        
-        // Backward compatibility constructor
-        public LabeledObject(String name, Rect boundingBox) {
-            this(name, "unknown", "default", "normal", "general", boundingBox);
-        }
-        
-        // Hierarchical classification methods
-        public String getFullClassification() {
-            return category + "_" + type + "_" + name + "_" + state + "_" + context;
-        }
-        
-        public boolean matchesCategory(String categoryPattern) {
-            return category.toLowerCase().contains(categoryPattern.toLowerCase());
-        }
-        
-        public boolean matchesHierarchy(String categoryPattern, String typePattern) {
-            return matchesCategory(categoryPattern) && 
-                   type.toLowerCase().contains(typePattern.toLowerCase());
-        }
-        
-        public String getLabel() { return name; }
-        public String getCategory() { return category; }
-        public String getType() { return type; }
-        public String getState() { return state; }
-        public String getContext() { return context; }
     }
     
     @Override
@@ -110,16 +63,15 @@ public class GestureLabelerFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_gesture_labeler, container, false);
         
         initializeViews(view);
-        initializeData();
-        setupClickListeners();
-        setupRecyclerView();
-        setupGestureRecording();
+        setupListeners();
+        setupBoundingBoxDrawing();
+        initializeBackend();
         
         return view;
     }
     
     private void initializeViews(View view) {
-        imageViewLabeling = view.findViewById(R.id.iv_labeling_image);
+        imageViewLabeling = view.findViewById(R.id.imageview_labeling);
         etObjectName = view.findViewById(R.id.et_object_name);
         btnLoadImage = view.findViewById(R.id.btn_load_image);
         btnSaveLabels = view.findViewById(R.id.btn_save_labels);
@@ -127,166 +79,132 @@ public class GestureLabelerFragment extends Fragment {
         btnImportDataset = view.findViewById(R.id.btn_import_dataset);
         rvLabeledObjects = view.findViewById(R.id.rv_labeled_objects);
         
-        btnRecordGesture = view.findViewById(R.id.btn_record_gesture);
-        btnSaveGesture = view.findViewById(R.id.btn_save_gesture);
-        etGestureLabel = view.findViewById(R.id.et_gesture_label);
-        gestureRecordingArea = view.findViewById(R.id.gesture_recording_area);
-        rvSavedGestures = view.findViewById(R.id.rv_saved_gestures);
-    }
-    
-    private void initializeData() {
         labeledObjects = new ArrayList<>();
-        savedGestures = new ArrayList<>();
         
-        // Initialize paint for bounding boxes
+        // Initialize bounding box paint
         boundingBoxPaint = new Paint();
         boundingBoxPaint.setColor(Color.RED);
         boundingBoxPaint.setStyle(Paint.Style.STROKE);
-        boundingBoxPaint.setStrokeWidth(3);
-        
-        // Initialize engines
-        if (getContext() != null) {
-            labelerEngine = new ObjectLabelerEngine(getContext());
-            detectionEngine = new ObjectDetectionEngine(getContext());
-        }
+        boundingBoxPaint.setStrokeWidth(4.0f);
+    }
+
+    private void initializeBackend() {
+        labelerEngine = new ObjectLabelerEngine(getContext());
+        detectionEngine = new ObjectDetectionEngine(getContext());
     }
     
-    private void setupClickListeners() {
-        if (btnLoadImage != null) {
-            btnLoadImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    loadImageForLabeling();
-                }
-            });
-        }
-        
-        if (btnSaveLabels != null) {
-            btnSaveLabels.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveCurrentLabels();
-                }
-            });
-        }
-        
-        if (btnExportDataset != null) {
-            btnExportDataset.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    exportTrainingDataset();
-                }
-            });
-        }
-        
-        if (btnImportDataset != null) {
-            btnImportDataset.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    importExistingDataset();
-                }
-            });
-        }
-        
-        if (imageViewLabeling != null) {
-            imageViewLabeling.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    return handleImageTouch(event);
-                }
-            });
-        }
+    private void setupListeners() {
+        btnLoadImage.setOnClickListener(v -> loadImageForLabeling());
+        btnSaveLabels.setOnClickListener(v -> saveLabeledObjects());
+        btnExportDataset.setOnClickListener(v -> exportTrainingDataset());
+        btnImportDataset.setOnClickListener(v -> importExistingDataset());
     }
-    
-    private boolean handleImageTouch(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                startX = event.getX();
-                startY = event.getY();
-                isDrawingBox = true;
-                return true;
-                
-            case MotionEvent.ACTION_MOVE:
-                if (isDrawingBox) {
-                    endX = event.getX();
-                    endY = event.getY();
-                    // Redraw bounding box preview
-                    invalidateImageView();
-                }
-                return true;
-                
-            case MotionEvent.ACTION_UP:
-                if (isDrawingBox) {
-                    endX = event.getX();
-                    endY = event.getY();
-                    isDrawingBox = false;
-                    
-                    // Create bounding box
-                    String objectName = etObjectName.getText().toString().trim();
-                    if (!objectName.isEmpty()) {
-                        createBoundingBox(objectName);
+
+    private void setupBoundingBoxDrawing() {
+        imageViewLabeling.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    startX = event.getX();
+                    startY = event.getY();
+                    isDrawingBox = true;
+                    return true;
+
+                case MotionEvent.ACTION_MOVE:
+                    if (isDrawingBox) {
+                        endX = event.getX();
+                        endY = event.getY();
+                        drawBoundingBox();
                     }
-                }
-                return true;
-        }
-        return false;
+                    return true;
+
+                case MotionEvent.ACTION_UP:
+                    if (isDrawingBox) {
+                        endX = event.getX();
+                        endY = event.getY();
+                        finalizeBoundingBox();
+                        isDrawingBox = false;
+                    }
+                    return true;
+            }
+            return false;
+        });
     }
-    
-    private void createBoundingBox(String objectName) {
-        int left = (int) Math.min(startX, endX);
-        int top = (int) Math.min(startY, endY);
-        int right = (int) Math.max(startX, endX);
-        int bottom = (int) Math.max(startY, endY);
+
+    private void drawBoundingBox() {
+        // Create overlay canvas for real-time drawing
+        Bitmap overlay = Bitmap.createBitmap(imageViewLabeling.getWidth(), imageViewLabeling.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(overlay);
         
-        Rect boundingBox = new Rect(left, top, right, bottom);
+        // Draw current bounding box
+        canvas.drawRect(startX, startY, endX, endY, boundingBoxPaint);
         
-        // Create enhanced labeled object with hierarchical classification
-        // For now, use default values - UI can be enhanced to capture these
-        LabeledObject labeledObject = new LabeledObject(objectName, "unknown", "default", "normal", "general", boundingBox);
-        labeledObjects.add(labeledObject);
+        // Draw existing boxes
+        for (LabeledObject obj : labeledObjects) {
+            canvas.drawRect(obj.boundingBox, boundingBoxPaint);
+        }
         
-        // Clear the input field
+        imageViewLabeling.setImageBitmap(overlay);
+    }
+
+    private void finalizeBoundingBox() {
+        String objectName = etObjectName.getText().toString().trim();
+        if (objectName.isEmpty()) {
+            Toast.makeText(getContext(), "Please enter object name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Rect boundingBox = new Rect((int)startX, (int)startY, (int)endX, (int)endY);
+        LabeledObject newObject = new LabeledObject(objectName, boundingBox, 1.0f);
+        labeledObjects.add(newObject);
+        
+        // Clear object name for next labeling
         etObjectName.setText("");
         
-        Toast.makeText(getContext(), "Object labeled: " + labeledObject.getFullClassification(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Object labeled: " + objectName, Toast.LENGTH_SHORT).show();
     }
-    
-    private void invalidateImageView() {
-        if (imageViewLabeling != null) {
-            imageViewLabeling.invalidate();
+
+    private void loadImageForLabeling() {
+        // Connect to GameAutomationEngine for screen capture
+        if (labelerEngine != null) {
+            labelerEngine.captureScreenForLabeling(new ObjectLabelerEngine.CaptureCallback() {
+                @Override
+                public void onCaptureComplete(Bitmap screenshot) {
+                    getActivity().runOnUiThread(() -> {
+                        imageViewLabeling.setImageBitmap(screenshot);
+                        labeledObjects.clear(); // Reset for new image
+                    });
+                }
+
+                @Override
+                public void onCaptureError(String error) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Screen capture failed: " + error, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
         }
     }
-    
-    private void loadImageForLabeling() {
-        // This would typically open a file picker or capture from screen
-        Toast.makeText(getContext(), "Image loading functionality", Toast.LENGTH_SHORT).show();
-    }
-    
-    private void saveCurrentLabels() {
-        if (labelerEngine != null && !labeledObjects.isEmpty()) {
-            labelerEngine.saveTrainingLabels(labeledObjects, new ObjectLabelerEngine.SaveCallback() {
+
+    private void saveLabeledObjects() {
+        if (labeledObjects.isEmpty()) {
+            Toast.makeText(getContext(), "No objects to save", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (labelerEngine != null) {
+            labelerEngine.saveLabeledObjects(labeledObjects, new ObjectLabelerEngine.SaveCallback() {
                 @Override
-                public void onSaveComplete() {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Labels saved successfully", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                public void onSaveComplete(int savedCount) {
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), savedCount + " objects saved successfully", Toast.LENGTH_SHORT).show();
+                    });
                 }
 
                 @Override
                 public void onSaveError(String error) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Save failed: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Save failed: " + error, Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
         }
@@ -297,26 +215,16 @@ public class GestureLabelerFragment extends Fragment {
             labelerEngine.exportTrainingDataset(new ObjectLabelerEngine.ExportCallback() {
                 @Override
                 public void onExportComplete(String filePath) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Dataset exported to: " + filePath, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Dataset exported to: " + filePath, Toast.LENGTH_LONG).show();
+                    });
                 }
 
                 @Override
                 public void onExportError(String error) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Export failed: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Export failed: " + error, Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
         }
@@ -327,116 +235,67 @@ public class GestureLabelerFragment extends Fragment {
             labelerEngine.importTrainingDataset(new ObjectLabelerEngine.ImportCallback() {
                 @Override
                 public void onImportComplete(List<LabeledObject> importedObjects) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                labeledObjects.addAll(importedObjects);
-                                Toast.makeText(getContext(), importedObjects.size() + " objects imported", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        labeledObjects.addAll(importedObjects);
+                        Toast.makeText(getContext(), importedObjects.size() + " objects imported", Toast.LENGTH_SHORT).show();
+                    });
                 }
 
                 @Override
                 public void onImportError(String error) {
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), "Import failed: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Import failed: " + error, Toast.LENGTH_SHORT).show();
+                    });
                 }
             });
         }
-    }
-    
-    private void setupGestureRecording() {
-        if (btnRecordGesture != null) {
-            btnRecordGesture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!isRecording) {
-                        startRecording();
-                    } else {
-                        stopRecording();
-                    }
-                }
-            });
-        }
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
         
-        if (btnSaveGesture != null) {
-            btnSaveGesture.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveCurrentGesture();
-                }
-            });
-        }
+        btnSaveGesture.setOnClickListener(v -> {
+            saveCurrentGesture();
+        });
         
-        if (gestureRecordingArea != null) {
-            gestureRecordingArea.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (isRecording) {
-                        // Handle touch events for gesture recording
-                        return true;
-                    }
-                    return false;
-                }
-            });
-        }
+        gestureRecordingArea.setOnTouchListener((v, event) -> {
+            if (isRecording) {
+                // Handle touch events for gesture recording
+                // This would capture the gesture path
+                return true;
+            }
+            return false;
+        });
     }
     
     private void setupRecyclerView() {
-        if (rvSavedGestures != null) {
-            gesturesAdapter = new SavedGesturesAdapter(savedGestures);
-            rvSavedGestures.setLayoutManager(new LinearLayoutManager(getContext()));
-            rvSavedGestures.setAdapter(gesturesAdapter);
-        }
+        gesturesAdapter = new SavedGesturesAdapter(savedGestures);
+        rvSavedGestures.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvSavedGestures.setAdapter(gesturesAdapter);
     }
     
     private void startRecording() {
         isRecording = true;
-        if (btnRecordGesture != null) {
-            btnRecordGesture.setText("Stop Recording");
-        }
-        if (btnSaveGesture != null) {
-            btnSaveGesture.setEnabled(false);
-        }
-        if (gestureRecordingArea != null) {
-            gestureRecordingArea.setBackgroundColor(0xFFFFE0E0); // Light red background
-        }
+        btnRecordGesture.setText("Stop Recording");
+        btnSaveGesture.setEnabled(false);
+        gestureRecordingArea.setBackgroundColor(0xFFFFE0E0); // Light red background
     }
     
     private void stopRecording() {
         isRecording = false;
-        if (btnRecordGesture != null) {
-            btnRecordGesture.setText("Record Gesture");
-        }
-        if (btnSaveGesture != null) {
-            btnSaveGesture.setEnabled(true);
-        }
-        if (gestureRecordingArea != null) {
-            gestureRecordingArea.setBackgroundColor(0xFFF0F0F0); // Original background
-        }
+        btnRecordGesture.setText(R.string.record);
+        btnSaveGesture.setEnabled(true);
+        gestureRecordingArea.setBackgroundColor(0xFFF0F0F0); // Original background
     }
     
     private void saveCurrentGesture() {
-        if (etGestureLabel != null) {
-            String gestureLabel = etGestureLabel.getText().toString().trim();
-            if (!gestureLabel.isEmpty()) {
-                savedGestures.add(gestureLabel);
-                if (gesturesAdapter != null) {
-                    gesturesAdapter.notifyItemInserted(savedGestures.size() - 1);
-                }
-                etGestureLabel.setText("");
-                if (btnSaveGesture != null) {
-                    btnSaveGesture.setEnabled(false);
-                }
-            }
+        String gestureLabel = etGestureLabel.getText().toString().trim();
+        if (!gestureLabel.isEmpty()) {
+            savedGestures.add(gestureLabel);
+            gesturesAdapter.notifyItemInserted(savedGestures.size() - 1);
+            etGestureLabel.setText("");
+            btnSaveGesture.setEnabled(false);
         }
     }
     
@@ -457,7 +316,7 @@ public class GestureLabelerFragment extends Fragment {
         
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            holder.bind(gestures.get(position));
+            holder.textView.setText(gestures.get(position));
         }
         
         @Override
@@ -466,12 +325,11 @@ public class GestureLabelerFragment extends Fragment {
         }
         
         static class ViewHolder extends RecyclerView.ViewHolder {
-            ViewHolder(View itemView) {
-                super(itemView);
-            }
+            android.widget.TextView textView;
             
-            void bind(String gesture) {
-                ((android.widget.TextView) itemView).setText(gesture);
+            ViewHolder(View view) {
+                super(view);
+                textView = view.findViewById(android.R.id.text1);
             }
         }
     }

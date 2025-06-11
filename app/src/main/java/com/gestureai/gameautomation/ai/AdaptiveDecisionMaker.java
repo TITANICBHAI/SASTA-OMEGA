@@ -2,6 +2,8 @@ package com.gestureai.gameautomation.ai;
 
 import android.util.Log;
 import com.gestureai.gameautomation.GameAction;
+import com.gestureai.gameautomation.managers.AIStackManager;
+
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -11,13 +13,7 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.learning.config.Adam;
 import org.nd4j.linalg.lossfunctions.LossFunctions;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import com.gestureai.gameautomation.data.UniversalGameState;
-import com.gestureai.gameautomation.data.UniversalGameState;
-import com.gestureai.gameautomation.ai.GameStrategyAgent;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -35,14 +31,14 @@ public class AdaptiveDecisionMaker {
             MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                     .seed(42)
                     .weightInit(WeightInit.XAVIER)
-                    .updater(new Adam(0.001))
+                    .updater(new org.nd4j.linalg.learning.config.Adam(0.001))
                     .list()
-                    .layer(new DenseLayer.Builder().nIn(10).nOut(64)
+                    .layer(new DenseLayer.Builder().nIn(10).nOut(64) // 10 action features
                             .activation(Activation.RELU).build())
                     .layer(new DenseLayer.Builder().nIn(64).nOut(32)
                             .activation(Activation.RELU).build())
                     .layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
-                            .nIn(32).nOut(1)
+                            .nIn(32).nOut(1) // Single decision score
                             .activation(Activation.SIGMOID).build())
                     .build();
 
@@ -187,7 +183,17 @@ public class AdaptiveDecisionMaker {
             Log.e(TAG, "Error learning from outcome", e);
         }
     }
-    
+    public void setAdaptiveLearningEnabled(boolean enabled) {
+        // Enable/disable adaptive learning based on user preference
+        Log.d(TAG, "Adaptive learning " + (enabled ? "enabled" : "disabled"));
+    }
+    public void setLearningRate(float rate) {
+        Log.d(TAG, "Learning rate set to: " + rate);
+    }
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
     public void cleanup() {
         try {
             if (decisionNetwork != null) {
@@ -195,9 +201,29 @@ public class AdaptiveDecisionMaker {
                 decisionNetwork = null;
             }
             isInitialized = false;
-            Log.d(TAG, "AdaptiveDecisionMaker cleaned up successfully");
+            Log.d(TAG, "AdaptiveDecisionMaker cleaned up");
         } catch (Exception e) {
-            Log.e(TAG, "Error during AdaptiveDecisionMaker cleanup", e);
+            Log.e(TAG, "Error during cleanup", e);
+        }
+    }
+
+    public AIStackManager.GameDecision makeAdvancedDecision(float[] gameState, String gameType) {
+        try {
+            if (!isInitialized || decisionNetwork == null) {
+                return new AIStackManager.GameDecision("tap", 0.5f, "fallback");
+            }
+
+            INDArray input = Nd4j.create(gameState).reshape(1, gameState.length);
+            INDArray output = decisionNetwork.output(input);
+
+            float confidence = output.getFloat(0);
+            String action = confidence > 0.7f ? "swipe_up" : "tap";
+
+            return new AIStackManager.GameDecision(action, confidence, "advanced");
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error in advanced decision making", e);
+            return new AIStackManager.GameDecision("tap", 0.3f, "error_fallback");
         }
     }
 }

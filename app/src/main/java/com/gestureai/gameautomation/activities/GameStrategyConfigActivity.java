@@ -67,13 +67,11 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
     private TextView tvLearningRateValue;
 
     // AI Components
-    private volatile GameTypeDetector gameTypeDetector;
-    private volatile MultiPlayerStrategy multiPlayerStrategy;
-    private volatile MOBAStrategy mobaStrategy;
-    private volatile FPSStrategy fpsStrategy;
-    private volatile AdaptiveDecisionMaker adaptiveDecisionMaker;
-    private final Object componentLock = new Object();
-    private volatile boolean isDestroyed = false;
+    private GameTypeDetector gameTypeDetector;
+    private MultiPlayerStrategy multiPlayerStrategy;
+    private MOBAStrategy mobaStrategy;
+    private FPSStrategy fpsStrategy;
+    private AdaptiveDecisionMaker adaptiveDecisionMaker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,11 +146,7 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
         ArrayAdapter<String> gameAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, gameTypes);
         gameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (spinnerGameType != null) {
-            spinnerGameType.setAdapter(gameAdapter);
-        } else {
-            Log.e(TAG, "spinnerGameType is null, cannot set adapter");
-        }
+        spinnerGameType.setAdapter(gameAdapter);
 
         // Strategy
         String[] strategies = {
@@ -161,11 +155,7 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
         ArrayAdapter<String> strategyAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, strategies);
         strategyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (spinnerStrategy != null) {
-            spinnerStrategy.setAdapter(strategyAdapter);
-        } else {
-            Log.e(TAG, "spinnerStrategy is null, cannot set adapter");
-        }
+        spinnerStrategy.setAdapter(strategyAdapter);
 
         // Battle Royale Drop Strategy
         String[] dropStrategies = {
@@ -174,11 +164,7 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
         ArrayAdapter<String> dropAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, dropStrategies);
         dropAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (spinnerDropStrategy != null) {
-            spinnerDropStrategy.setAdapter(dropAdapter);
-        } else {
-            Log.e(TAG, "spinnerDropStrategy is null, cannot set adapter");
-        }
+        spinnerDropStrategy.setAdapter(dropAdapter);
 
         // MOBA Role
         String[] roles = {
@@ -187,11 +173,7 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
         ArrayAdapter<String> roleAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, roles);
         roleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        if (spinnerRole != null) {
-            spinnerRole.setAdapter(roleAdapter);
-        } else {
-            Log.e(TAG, "spinnerRole is null, cannot set adapter");
-        }
+        spinnerRole.setAdapter(roleAdapter);
 
         // FPS Weapon Preference
         String[] weapons = {
@@ -520,84 +502,3 @@ public class GameStrategyConfigActivity extends AppCompatActivity {
         Log.d(TAG, "Configuration saved");
     }
 }
-    @Override
-    protected void onDestroy() {
-        isDestroyed = true;
-        
-        // Clean up AI components to prevent memory leaks
-        synchronized (componentLock) {
-            try {
-                if (gameTypeDetector != null) {
-                    gameTypeDetector = null;
-                }
-                if (multiPlayerStrategy != null) {
-                    multiPlayerStrategy = null;
-                }
-                if (mobaStrategy != null) {
-                    mobaStrategy = null;
-                }
-                if (fpsStrategy != null) {
-                    fpsStrategy = null;
-                }
-                if (adaptiveDecisionMaker != null) {
-                    adaptiveDecisionMaker = null;
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error during component cleanup", e);
-            }
-        }
-        
-        super.onDestroy();
-        Log.d(TAG, "GameStrategyConfigActivity destroyed with proper cleanup");
-    }
-
-    private void showErrorAndFinish(String message) {
-        Log.e(TAG, "Showing error and finishing: " + message);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        finish();
-    }
-    
-    private void initializeFallbackComponents() {
-        synchronized (componentLock) {
-            try {
-                if (gameTypeDetector == null) {
-                    gameTypeDetector = new GameTypeDetector();
-                }
-                if (adaptiveDecisionMaker == null) {
-                    adaptiveDecisionMaker = new AdaptiveDecisionMaker();
-                }
-                Log.d(TAG, "Fallback AI components initialized");
-            } catch (Exception e) {
-                Log.e(TAG, "Failed to initialize fallback components", e);
-            }
-        }
-    }
-    
-    private void cleanupAIComponents() {
-        synchronized (componentLock) {
-            try {
-                if (multiPlayerStrategy != null) {
-                    multiPlayerStrategy.cleanup();
-                    multiPlayerStrategy = null;
-                }
-                if (mobaStrategy != null) {
-                    mobaStrategy.cleanup();
-                    mobaStrategy = null;
-                }
-                if (fpsStrategy != null) {
-                    fpsStrategy.cleanup();
-                    fpsStrategy = null;
-                }
-                Log.d(TAG, "AI components cleaned up");
-            } catch (Exception e) {
-                Log.e(TAG, "Error cleaning up AI components", e);
-            }
-        }
-    }
-    
-    @Override
-    protected void onDestroy() {
-        isDestroyed = true;
-        cleanupAIComponents();
-        super.onDestroy();
-    }

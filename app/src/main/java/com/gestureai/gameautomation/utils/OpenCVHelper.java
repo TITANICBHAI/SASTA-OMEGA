@@ -1,426 +1,290 @@
-package com.gestureai.gameautomation.utils;
+
+ package com.gestureai.gameautomation.utils;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.*;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.objdetect.CascadeClassifier;
-import org.opencv.features2d.ORB;
-import org.opencv.core.MatOfKeyPoint;
-import org.opencv.core.KeyPoint;
-import java.util.ArrayList;
-import java.util.List;
+import org.opencv.android.OpenCVLoader;
 
-/**
- * OpenCV Helper for computer vision operations
- */
 public class OpenCVHelper {
     private static final String TAG = "OpenCVHelper";
     private static boolean isInitialized = false;
-    private static Context appContext;
-    
-    // OpenCV components
-    private static CascadeClassifier faceDetector;
-    private static ORB orbDetector;
-    
-    public static class Detection {
-        public String className;
-        public float confidence;
-        public float x, y, width, height;
-        
-        public Detection(String className, float confidence, float x, float y, float width, float height) {
-            this.className = className;
-            this.confidence = confidence;
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-    }
-    
-    private static BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(appContext) {
+    private static Context applicationContext;
+
+    private static BaseLoaderCallback loaderCallback = new BaseLoaderCallback(null) {
         @Override
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.d(TAG, "OpenCV loaded successfully");
                     isInitialized = true;
-                    initializeDetectors();
                     break;
                 default:
-                    Log.e(TAG, "OpenCV initialization failed");
-                    isInitialized = false;
+                    Log.e(TAG, "OpenCV loading failed with status: " + status);
+                    super.onManagerConnected(status);
                     break;
             }
         }
     };
-    
-    public static void initOpenCV(Context context) {
-        if (isInitialized) {
-            return; // Already initialized
-        }
-        
-        appContext = context.getApplicationContext();
-        
+
+    public static boolean initOpenCV(Context context) {
+        applicationContext = context.getApplicationContext();
+
         try {
-            // Try static initialization first (from AAR file)
+            // Try static initialization first (faster and more reliable)
             if (OpenCVLoader.initDebug()) {
-                Log.d(TAG, "OpenCV static initialization successful");
+                Log.d(TAG, "OpenCV loaded successfully (static)");
                 isInitialized = true;
-                initializeDetectors();
-                return;
-            }
-            
-            // Fallback to async initialization
-            Log.d(TAG, "Attempting OpenCV async initialization");
-            boolean asyncResult = OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, context, new BaseLoaderCallback(context) {
-                @Override
-                public void onManagerConnected(int status) {
-                    switch (status) {
-                        case LoaderCallbackInterface.SUCCESS:
-                            Log.d(TAG, "OpenCV async initialization successful");
-                            isInitialized = true;
-                            initializeDetectors();
-                            break;
-                        case LoaderCallbackInterface.INIT_FAILED:
-                            Log.e(TAG, "OpenCV initialization failed");
-                            isInitialized = false;
-                            break;
-                        case LoaderCallbackInterface.INSTALL_CANCELED:
-                            Log.w(TAG, "OpenCV installation canceled");
-                            isInitialized = false;
-                            break;
-                        case LoaderCallbackInterface.INCOMPATIBLE_MANAGER_VERSION:
-                            Log.e(TAG, "OpenCV Manager incompatible version");
-                            isInitialized = false;
-                            break;
-                        case LoaderCallbackInterface.MARKET_ERROR:
-                            Log.e(TAG, "OpenCV Market error");
-                            isInitialized = false;
-                            break;
-                        default:
-                            Log.e(TAG, "OpenCV unknown initialization error: " + status);
-                            isInitialized = false;
-                            break;
+                return true;
+            } else {
+                Log.w(TAG, "Static OpenCV loading failed, trying dynamic loading");
+                
+                // Fallback to async loading
+                loaderCallback = new BaseLoaderCallback(applicationContext) {
+                    @Override
+                    public void onManagerConnected(int status) {
+                        switch (status) {
+                            case LoaderCallbackInterface.SUCCESS:
+                                Log.d(TAG, "OpenCV loaded successfully (dynamic)");
+                                isInitialized = true;
+                                break;
+                            default:
+                                Log.e(TAG, "OpenCV loading failed with status: " + status);
+                                isInitialized = false;
+                                break;
+                        }
                     }
-                }
-            });
-            
-            if (!asyncResult) {
-                Log.e(TAG, "OpenCV async initialization failed to start");
-                isInitialized = false;
+                };
+                
+                // Try async initialization as fallback
+                return OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, applicationContext, loaderCallback);
             }
-            
         } catch (Exception e) {
-            Log.e(TAG, "Critical error during OpenCV initialization", e);
+            Log.e(TAG, "OpenCV initialization failed: " + e.getMessage());
             isInitialized = false;
+            return false;
         }
+        
+        return false;
     }
-    
-    private static void initializeDetectors() {
-        try {
-            // Initialize ORB feature detector
-            orbDetector = ORB.create();
-            
-            Log.d(TAG, "OpenCV detectors initialized");
-        } catch (Exception e) {
-            Log.e(TAG, "Error initializing OpenCV detectors", e);
-        }
-    }
-    
+
     public static boolean isInitialized() {
         return isInitialized;
     }
+
+    // Object detection helper methods
+    public static Mat preprocessImage(Mat input) {
+        Mat processed = new Mat();
+        Imgproc.cvtColor(input, processed, Imgproc.COLOR_RGBA2RGB);
+        return processed;
+    }
+
+    /**
+     * CRITICAL: Template matching integration for custom labeled objects
+     */
+    private static java.util.Map<String, Mat> templateCache = new java.util.HashMap<>();
     
-    public static List<Detection> detectObjects(Bitmap bitmap) {
-        List<Detection> detections = new ArrayList<>();
-        
-        if (!isInitialized) {
-            Log.w(TAG, "OpenCV not initialized");
-            return detections;
-        }
+    public void addTemplate(String objectName, android.graphics.Bitmap template, float confidence) {
+        if (!isInitialized) return;
         
         try {
             // Convert bitmap to OpenCV Mat
-            Mat rgbMat = new Mat();
-            Utils.bitmapToMat(bitmap, rgbMat);
+            Mat templateMat = new Mat();
+            org.opencv.android.Utils.bitmapToMat(template, templateMat);
             
-            // Convert to grayscale for processing
-            Mat grayMat = new Mat();
-            Imgproc.cvtColor(rgbMat, grayMat, Imgproc.COLOR_RGB2GRAY);
+            // Preprocess template
+            Mat processedTemplate = preprocessImage(templateMat);
             
-            // Detect shapes using contour detection
-            List<Detection> shapeDetections = detectShapes(grayMat);
-            detections.addAll(shapeDetections);
+            // Cache the template for future matching
+            templateCache.put(objectName, processedTemplate);
             
-            // Detect features using ORB
-            List<Detection> featureDetections = detectFeatures(grayMat);
-            detections.addAll(featureDetections);
-            
-            // Template matching for specific objects
-            List<Detection> templateDetections = detectTemplates(grayMat);
-            detections.addAll(templateDetections);
+            Log.d(TAG, "Added template for object: " + objectName + " with confidence: " + confidence);
             
         } catch (Exception e) {
-            Log.e(TAG, "Error in OpenCV object detection", e);
-        }
-        
-        return detections;
-    }
-    
-    private static List<Detection> detectShapes(Mat grayMat) {
-        List<Detection> detections = new ArrayList<>();
-        
-        Mat blurred = null;
-        Mat edges = null;
-        Mat hierarchy = null;
-        List<MatOfPoint> contours = new ArrayList<>();
-        
-        try {
-            // Apply Gaussian blur with memory management
-            blurred = new Mat();
-            Imgproc.GaussianBlur(grayMat, blurred, new Size(5, 5), 0);
-            
-            // Apply Canny edge detection
-            edges = new Mat();
-            Imgproc.Canny(blurred, edges, 50, 150);
-            
-            // Find contours
-            hierarchy = new Mat();
-            Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-            
-            // Analyze contours with memory bounds checking
-            for (MatOfPoint contour : contours) {
-                try {
-                    double area = Imgproc.contourArea(contour);
-                    if (area > 1000) { // Filter small contours
-                        Rect boundingRect = Imgproc.boundingRect(contour);
-                        
-                        // Classify shape based on contour properties
-                        String shapeName = classifyShape(contour, area);
-                        float confidence = calculateShapeConfidence(contour, area);
-                        
-                        detections.add(new Detection(
-                            shapeName,
-                            confidence,
-                            boundingRect.x,
-                            boundingRect.y,
-                            boundingRect.width,
-                            boundingRect.height
-                        ));
-                    }
-                } catch (Exception e) {
-                    Log.w(TAG, "Error processing contour", e);
-                } finally {
-                    // Release contour Mat to prevent memory leak
-                    if (contour != null) {
-                        contour.release();
-                    }
-                }
-            }
-            
-        } catch (OutOfMemoryError e) {
-            Log.e(TAG, "OOM in shape detection", e);
-            System.gc();
-        } catch (Exception e) {
-            Log.e(TAG, "Error in shape detection", e);
-        } finally {
-            // Critical: Release all OpenCV Mat objects
-            if (hierarchy != null) {
-                hierarchy.release();
-            }
-            if (edges != null) {
-                edges.release();
-            }
-            if (blurred != null) {
-                blurred.release();
-            }
-            
-            // Release any remaining contours
-            for (MatOfPoint contour : contours) {
-                if (contour != null) {
-                    contour.release();
-                }
-            }
-            contours.clear();
-        }
-        
-        return detections;
-    }
-    
-    private static String classifyShape(MatOfPoint contour, double area) {
-        // Approximate contour to polygon
-        MatOfPoint2f contour2f = new MatOfPoint2f();
-        contour.convertTo(contour2f, CvType.CV_32FC2);
-        
-        MatOfPoint2f approx = new MatOfPoint2f();
-        double epsilon = 0.02 * Imgproc.arcLength(contour2f, true);
-        Imgproc.approxPolyDP(contour2f, approx, epsilon, true);
-        
-        Point[] points = approx.toArray();
-        int vertices = points.length;
-        
-        // Classify based on number of vertices
-        switch (vertices) {
-            case 3: return "triangle";
-            case 4:
-                // Check if rectangle or square
-                Rect boundingRect = Imgproc.boundingRect(contour);
-                double aspectRatio = (double) boundingRect.width / boundingRect.height;
-                return (aspectRatio >= 0.95 && aspectRatio <= 1.05) ? "square" : "rectangle";
-            case 5: return "pentagon";
-            default:
-                // Check if circle
-                double perimeter = Imgproc.arcLength(contour2f, true);
-                double circularity = 4 * Math.PI * area / (perimeter * perimeter);
-                return (circularity > 0.7) ? "circle" : "polygon";
+            Log.e(TAG, "Error adding template for " + objectName, e);
         }
     }
     
-    private static float calculateShapeConfidence(MatOfPoint contour, double area) {
-        // Calculate confidence based on contour properties
-        MatOfPoint2f contour2f = new MatOfPoint2f();
-        contour.convertTo(contour2f, CvType.CV_32FC2);
+    /**
+     * Perform template matching on input image
+     */
+    public java.util.List<TemplateMatch> matchTemplates(Mat inputImage) {
+        java.util.List<TemplateMatch> matches = new java.util.ArrayList<>();
         
-        double perimeter = Imgproc.arcLength(contour2f, true);
-        double compactness = (perimeter * perimeter) / area;
-        
-        // Normalize compactness to confidence score
-        float confidence = (float) Math.max(0.0, Math.min(1.0, 1.0 - (compactness - 12.0) / 100.0));
-        return confidence;
-    }
-    
-    private static List<Detection> detectFeatures(Mat grayMat) {
-        List<Detection> detections = new ArrayList<>();
-        
-        if (orbDetector == null) {
-            return detections;
+        if (!isInitialized || templateCache.isEmpty()) {
+            return matches;
         }
         
         try {
-            // Detect keypoints
-            MatOfKeyPoint keypoints = new MatOfKeyPoint();
-            Mat descriptors = new Mat();
-            orbDetector.detectAndCompute(grayMat, new Mat(), keypoints, descriptors);
+            Mat preprocessedInput = preprocessImage(inputImage);
             
-            KeyPoint[] keypointArray = keypoints.toArray();
-            
-            // Group nearby keypoints into objects
-            List<List<KeyPoint>> clusters = clusterKeypoints(keypointArray);
-            
-            for (List<KeyPoint> cluster : clusters) {
-                if (cluster.size() >= 5) { // Minimum keypoints for object
-                    // Calculate bounding box for cluster
-                    float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
-                    float maxX = Float.MIN_VALUE, maxY = Float.MIN_VALUE;
-                    
-                    for (KeyPoint kp : cluster) {
-                        minX = Math.min(minX, (float) kp.pt.x);
-                        minY = Math.min(minY, (float) kp.pt.y);
-                        maxX = Math.max(maxX, (float) kp.pt.x);
-                        maxY = Math.max(maxY, (float) kp.pt.y);
-                    }
-                    
-                    float confidence = Math.min(1.0f, cluster.size() / 20.0f);
-                    
-                    detections.add(new Detection(
-                        "feature_cluster",
-                        confidence,
-                        minX,
-                        minY,
-                        maxX - minX,
-                        maxY - minY
-                    ));
-                }
-            }
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error in feature detection", e);
-        }
-        
-        return detections;
-    }
-    
-    private static List<List<KeyPoint>> clusterKeypoints(KeyPoint[] keypoints) {
-        List<List<KeyPoint>> clusters = new ArrayList<>();
-        boolean[] assigned = new boolean[keypoints.length];
-        double clusterDistance = 50.0; // Maximum distance for clustering
-        
-        for (int i = 0; i < keypoints.length; i++) {
-            if (assigned[i]) continue;
-            
-            List<KeyPoint> cluster = new ArrayList<>();
-            cluster.add(keypoints[i]);
-            assigned[i] = true;
-            
-            // Find nearby keypoints
-            for (int j = i + 1; j < keypoints.length; j++) {
-                if (assigned[j]) continue;
+            for (java.util.Map.Entry<String, Mat> entry : templateCache.entrySet()) {
+                String objectName = entry.getKey();
+                Mat template = entry.getValue();
                 
-                double distance = Math.sqrt(
-                    Math.pow(keypoints[i].pt.x - keypoints[j].pt.x, 2) +
-                    Math.pow(keypoints[i].pt.y - keypoints[j].pt.y, 2)
+                // Perform template matching
+                Mat result = new Mat();
+                Imgproc.matchTemplate(preprocessedInput, template, result, Imgproc.TM_CCOEFF_NORMED);
+                
+                // Find matches above threshold
+                double threshold = 0.7; // Adjustable threshold
+                org.opencv.core.Core.MinMaxLocResult mmr = org.opencv.core.Core.minMaxLoc(result);
+                
+                if (mmr.maxVal >= threshold) {
+                    int x = (int) mmr.maxLoc.x;
+                    int y = (int) mmr.maxLoc.y;
+                    int width = template.cols();
+                    int height = template.rows();
+                    
+                    TemplateMatch match = new TemplateMatch(
+                        objectName, 
+                        new Rect(x, y, width, height), 
+                        mmr.maxVal
+                    );
+                    
+                    matches.add(match);
+                }
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error in template matching", e);
+        }
+        
+        return matches;
+    }
+    
+    /**
+     * Convert OpenCV template matches to DetectedObject format
+     */
+    public java.util.List<com.gestureai.gameautomation.ObjectDetectionEngine.DetectedObject> 
+        convertToDetectedObjects(java.util.List<TemplateMatch> matches) {
+        
+        java.util.List<com.gestureai.gameautomation.ObjectDetectionEngine.DetectedObject> objects = 
+            new java.util.ArrayList<>();
+        
+        for (TemplateMatch match : matches) {
+            com.gestureai.gameautomation.ObjectDetectionEngine.DetectedObject obj = 
+                new com.gestureai.gameautomation.ObjectDetectionEngine.DetectedObject(
+                    match.objectName,
+                    match.boundingRect,
+                    (float) match.confidence,
+                    determineActionType(match.objectName),
+                    "OpenCV template match"
                 );
-                
-                if (distance < clusterDistance) {
-                    cluster.add(keypoints[j]);
-                    assigned[j] = true;
-                }
-            }
             
-            clusters.add(cluster);
+            objects.add(obj);
         }
         
-        return clusters;
+        return objects;
     }
     
-    private static List<Detection> detectTemplates(Mat grayMat) {
-        List<Detection> detections = new ArrayList<>();
-        
-        // Template matching would go here
-        // For now, return empty list as templates would need to be loaded from assets
-        
-        return detections;
-    }
-    
-    public static Mat enhanceImage(Bitmap bitmap) {
-        if (!isInitialized) {
-            return null;
-        }
-        
-        try {
-            Mat rgbMat = new Mat();
-            Utils.bitmapToMat(bitmap, rgbMat);
-            
-            // Apply histogram equalization
-            Mat enhanced = new Mat();
-            List<Mat> channels = new ArrayList<>();
-            Core.split(rgbMat, channels);
-            
-            for (Mat channel : channels) {
-                Imgproc.equalizeHist(channel, channel);
-            }
-            
-            Core.merge(channels, enhanced);
-            return enhanced;
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error enhancing image", e);
-            return null;
+    /**
+     * Determine action type based on object name
+     */
+    private String determineActionType(String objectName) {
+        switch (objectName.toLowerCase()) {
+            case "coin":
+            case "collectible":
+                return "tap";
+            case "obstacle":
+                return "avoid";
+            case "powerup":
+                return "tap";
+            case "enemy":
+                return "avoid";
+            default:
+                return "tap";
         }
     }
+
+    public static void drawBoundingBox(Mat image, Rect boundingBox, String label, double confidence) {
+        if (!isInitialized) return;
+
+        // Draw rectangle
+        Imgproc.rectangle(image, boundingBox.tl(), boundingBox.br(), new Scalar(0, 255, 0), 2);
+
+        // Draw label background
+        String text = label + ": " + String.format("%.1f%%", confidence * 100);
+        int[] baseLine = new int[1];
+        org.opencv.core.Size textSize = Imgproc.getTextSize(text, Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, 1, baseLine);
+
+        Imgproc.rectangle(image,
+            new org.opencv.core.Point(boundingBox.x, boundingBox.y - textSize.height - 10),
+            new org.opencv.core.Point(boundingBox.x + textSize.width, boundingBox.y),
+            new Scalar(0, 255, 0), -1);
+
+        // Draw text
+        Imgproc.putText(image, text,
+            new org.opencv.core.Point(boundingBox.x, boundingBox.y - 5),
+            Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(0, 0, 0), 1);
+    }
+
+    // Image processing utilities for game object detection
+    public static Mat detectCoins(Mat gameScreen) {
+        Mat result = new Mat();
+        Mat hsv = new Mat();
+
+        // Convert to HSV for better color detection
+        Imgproc.cvtColor(gameScreen, hsv, Imgproc.COLOR_RGB2HSV);
+
+        // Define HSV range for yellow coins
+        Scalar lowerYellow = new Scalar(20, 100, 100);
+        Scalar upperYellow = new Scalar(30, 255, 255);
+
+        // Create mask for yellow objects (coins)
+        org.opencv.core.Core.inRange(hsv, lowerYellow, upperYellow, result);
+
+        return result;
+    }
+
+    public static Mat detectObstacles(Mat gameScreen) {
+        Mat result = new Mat();
+        Mat gray = new Mat();
+
+        // Convert to grayscale
+        Imgproc.cvtColor(gameScreen, gray, Imgproc.COLOR_RGB2GRAY);
+
+        // Apply edge detection
+        Imgproc.Canny(gray, result, 50, 150);
+
+        return result;
+    }
+
+    public static Mat detectPowerUps(Mat gameScreen) {
+        Mat result = new Mat();
+        Mat hsv = new Mat();
+
+        // Convert to HSV
+        Imgproc.cvtColor(gameScreen, hsv, Imgproc.COLOR_RGB2HSV);
+
+        // Define HSV range for power-ups (usually bright colors)
+        Scalar lowerBright = new Scalar(0, 100, 200);
+        Scalar upperBright = new Scalar(180, 255, 255);
+
+        // Create mask for bright objects
+        org.opencv.core.Core.inRange(hsv, lowerBright, upperBright, result);
+
+        return result;
+    }
     
-    public static void cleanup() {
-        if (orbDetector != null) {
-            // ORB cleanup is handled by OpenCV
-            orbDetector = null;
+    /**
+     * Template match result class
+     */
+    public static class TemplateMatch {
+        public String objectName;
+        public Rect boundingRect;
+        public double confidence;
+        
+        public TemplateMatch(String objectName, Rect boundingRect, double confidence) {
+            this.objectName = objectName;
+            this.boundingRect = boundingRect;
+            this.confidence = confidence;
         }
-        isInitialized = false;
-        Log.d(TAG, "OpenCV helper cleaned up");
     }
 }

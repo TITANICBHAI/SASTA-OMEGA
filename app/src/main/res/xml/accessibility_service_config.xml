@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
     android:accessibilityEventTypes="typeAllMask"
-    android:accessibilityFlags="flagDefault|flagRetrieveInteractiveWindows|flagRequestTouchExplorationMode"
-    android:accessibilityFeedbackType="feedbackSpoken"
-    android:notificationTimeout="100"
-    android:canRetrieveWindowContent="true"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagDefault|flagRequestTouchExplorationMode|flagRequestFilterKeyEvents"
     android:canPerformGestures="true"
-    android:packageNames="com.tencent.ig,com.pubg.krmobile,com.mojang.minecraftpe,com.supercell.clashofclans,com.king.candycrushsaga,com.miHoYo.GenshinImpact,com.riotgames.league.wildrift"
-    android:settingsActivity="com.gestureai.gameautomation.activities.SettingsActivity"
-    android:description="@string/accessibility_service_description" />
+    android:canRetrieveWindowContent="true"
+    android:description="@string/accessibility_service_description"
+    android:notificationTimeout="100"
+    android:packageNames="com.android.systemui" />

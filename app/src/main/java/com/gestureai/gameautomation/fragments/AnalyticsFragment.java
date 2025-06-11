@@ -54,12 +54,7 @@ public class AnalyticsFragment extends Fragment {
     private SessionAnalyticsAdapter sessionsAdapter;
     private Handler updateHandler;
     private Runnable updateRunnable;
-    private volatile boolean isMonitoring = false;
-    private volatile boolean isDestroyed = false;
-    
-    // Database query management
-    private final java.util.concurrent.ExecutorService queryExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
-    private final java.util.concurrent.ConcurrentHashMap<String, java.util.concurrent.Future<?>> activeQueries = new java.util.concurrent.ConcurrentHashMap<>();
+    private boolean isMonitoring = false;
     
     // Real-time data
     private List<Float> fpsHistory = new ArrayList<>();
@@ -80,112 +75,27 @@ public class AnalyticsFragment extends Fragment {
     }
     
     private void initializeViews(View view) {
-        if (view == null || isDestroyed) {
-            android.util.Log.w("AnalyticsFragment", "Cannot initialize views - view is null or fragment destroyed");
-            return;
-        }
+        // Performance metrics
+        tvSuccessRate = view.findViewById(R.id.tv_success_rate);
+        tvAverageReactionTime = view.findViewById(R.id.tv_avg_reaction_time);
+        tvTotalActions = view.findViewById(R.id.tv_total_actions);
+        tvCurrentFPS = view.findViewById(R.id.tv_current_fps);
+        tvMemoryUsage = view.findViewById(R.id.tv_memory_usage);
+        tvCPUUsage = view.findViewById(R.id.tv_cpu_usage);
         
-        try {
-            // Performance metrics
-            tvSuccessRate = view.findViewById(R.id.tv_success_rate);
-            tvAverageReactionTime = view.findViewById(R.id.tv_avg_reaction_time);
-            tvTotalActions = view.findViewById(R.id.tv_total_actions);
-            tvCurrentFPS = view.findViewById(R.id.tv_current_fps);
-            tvMemoryUsage = view.findViewById(R.id.tv_memory_usage);
-            tvCPUUsage = view.findViewById(R.id.tv_cpu_usage);
-            
-            // Charts
-            chartPerformance = view.findViewById(R.id.chart_performance);
-            chartActionDistribution = view.findViewById(R.id.chart_action_distribution);
-            
-            // Session history
-            rvSessionHistory = view.findViewById(R.id.rv_session_history);
-            if (rvSessionHistory != null && getContext() != null) {
-                rvSessionHistory.setLayoutManager(new LinearLayoutManager(getContext()));
-            }
-            
-            // Control buttons
-            btnExportAnalytics = view.findViewById(R.id.btn_export_analytics);
-            btnClearData = view.findViewById(R.id.btn_clear_data);
-            btnStartMonitoring = view.findViewById(R.id.btn_start_monitoring);
-            btnStopMonitoring = view.findViewById(R.id.btn_stop_monitoring);
-            
-            // Validate critical views
-            if (btnStartMonitoring == null || btnStopMonitoring == null) {
-                throw new IllegalStateException("Critical control buttons missing from layout");
-            }
-            
-        } catch (Exception e) {
-            android.util.Log.e("AnalyticsFragment", "Error initializing views", e);
-            isDestroyed = true;
-        }
-    }
-    
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        isDestroyed = true;
-        stopRealTimeUpdates();
+        // Charts
+        chartPerformance = view.findViewById(R.id.chart_performance);
+        chartActionDistribution = view.findViewById(R.id.chart_action_distribution);
         
-        // Cancel all active database queries to prevent leaks
-        for (java.util.concurrent.Future<?> query : activeQueries.values()) {
-            if (query != null && !query.isDone()) {
-                query.cancel(true);
-            }
-        }
-        activeQueries.clear();
+        // Session history
+        rvSessionHistory = view.findViewById(R.id.rv_session_history);
+        rvSessionHistory.setLayoutManager(new LinearLayoutManager(getContext()));
         
-        // Shutdown query executor
-        if (queryExecutor != null && !queryExecutor.isShutdown()) {
-            queryExecutor.shutdown();
-            try {
-                if (!queryExecutor.awaitTermination(1, java.util.concurrent.TimeUnit.SECONDS)) {
-                    queryExecutor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                queryExecutor.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-        
-        // Clean up handlers
-        if (updateHandler != null && updateRunnable != null) {
-            updateHandler.removeCallbacks(updateRunnable);
-        }
-        
-        // Clear view references
-        tvSuccessRate = null;
-        tvAverageReactionTime = null;
-        tvTotalActions = null;
-        tvCurrentFPS = null;
-        tvMemoryUsage = null;
-        tvCPUUsage = null;
-        chartPerformance = null;
-        chartActionDistribution = null;
-        rvSessionHistory = null;
-        btnExportAnalytics = null;
-        btnClearData = null;
-        btnStartMonitoring = null;
-        btnStopMonitoring = null;
-        
-        // Clear data lists
-        if (fpsHistory != null) fpsHistory.clear();
-        if (reactionTimeHistory != null) reactionTimeHistory.clear();
-        if (sessionHistory != null) sessionHistory.clear();
-        
-        // Clear backend references
-        performanceTracker = null;
-        resourceMonitor = null;
-        sessionsAdapter = null;
-        updateHandler = null;
-        updateRunnable = null;
-    }
-    
-    private void stopRealTimeUpdates() {
-        isMonitoring = false;
-        if (updateHandler != null && updateRunnable != null) {
-            updateHandler.removeCallbacks(updateRunnable);
-        }
+        // Control buttons
+        btnExportAnalytics = view.findViewById(R.id.btn_export_analytics);
+        btnClearData = view.findViewById(R.id.btn_clear_data);
+        btnStartMonitoring = view.findViewById(R.id.btn_start_monitoring);
+        btnStopMonitoring = view.findViewById(R.id.btn_stop_monitoring);
     }
     
     private void initializeBackend() {

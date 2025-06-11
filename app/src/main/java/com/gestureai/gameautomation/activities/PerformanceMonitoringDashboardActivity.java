@@ -45,11 +45,6 @@ public class PerformanceMonitoringDashboardActivity extends AppCompatActivity im
     private PerformanceHistoryAdapter historyAdapter;
     private List<PerformanceSnapshot> performanceHistory;
     
-    // Critical: Memory leak prevention
-    private android.os.Handler uiUpdateHandler;
-    private Runnable uiUpdateRunnable;
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +53,6 @@ public class PerformanceMonitoringDashboardActivity extends AppCompatActivity im
         initializeViews();
         initializePerformanceManager();
         setupEventListeners();
-        initializeUIUpdates();
         updateUI();
         
         Log.d(TAG, "Performance Monitoring Dashboard initialized");
@@ -302,47 +296,12 @@ public class PerformanceMonitoringDashboardActivity extends AppCompatActivity im
         });
     }
     
-    private void initializeUIUpdates() {
-        uiUpdateHandler = new android.os.Handler(android.os.Looper.getMainLooper());
-        uiUpdateRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (!isDestroyed.get() && performanceManager != null && performanceManager.isMonitoring()) {
-                    updateMetricsDisplay();
-                    uiUpdateHandler.postDelayed(this, 1000); // Update every second
-                }
-            }
-        };
-    }
-    
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
-        
-        // Clean up UI update handler
-        if (uiUpdateHandler != null) {
-            uiUpdateHandler.removeCallbacksAndMessages(null);
-            if (uiUpdateRunnable != null) {
-                uiUpdateHandler.removeCallbacks(uiUpdateRunnable);
-                uiUpdateRunnable = null;
-            }
-            uiUpdateHandler = null;
-        }
-        
-        // Clean up performance manager listener
         if (performanceManager != null) {
             performanceManager.removePerformanceUpdateListener(this);
-            performanceManager = null;
         }
-        
-        // Clear adapter reference
-        historyAdapter = null;
-        performanceHistory = null;
-        
-        Log.d(TAG, "PerformanceMonitoringDashboardActivity destroyed - memory cleaned up");
     }
     
     // Performance History Adapter

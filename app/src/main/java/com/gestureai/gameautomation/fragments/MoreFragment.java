@@ -119,13 +119,49 @@ public class MoreFragment extends Fragment {
             startActivity(intent);
         });
 
-        // Add AI comparison button handler
+        // Add new dashboard access points
+        Button btnPerformanceDashboard = view.findViewById(R.id.btn_performance_dashboard);
+        Button btnTrainingProgress = view.findViewById(R.id.btn_training_progress);
+        Button btnGameConfiguration = view.findViewById(R.id.btn_game_configuration);
+        Button btnGestureSequence = view.findViewById(R.id.btn_gesture_sequence);
+        Button btnSessionAnalytics = view.findViewById(R.id.btn_session_analytics);
         Button btnAIComparison = view.findViewById(R.id.btn_ai_comparison);
-        if (btnAIComparison != null) {
-            btnAIComparison.setOnClickListener(v -> {
-                Intent intent = new Intent(getActivity(), AIPerformanceComparisonActivity.class);
-                startActivity(intent);
-            });
-        }
+        Button btnDebugOverlay = view.findViewById(R.id.btn_debug_overlay);
+
+        btnPerformanceDashboard.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), RealTimePerformanceDashboardActivity.class);
+            startActivity(intent);
+        });
+
+        btnTrainingProgress.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), TrainingProgressVisualizerActivity.class);
+            startActivity(intent);
+        });
+
+        btnGameConfiguration.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), GameConfigurationWizardActivity.class);
+            startActivity(intent);
+        });
+
+        btnGestureSequence.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), GestureSequenceBuilderActivity.class);
+            startActivity(intent);
+        });
+
+        btnSessionAnalytics.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), SessionAnalyticsDashboardActivity.class);
+            startActivity(intent);
+        });
+
+        btnAIComparison.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), AIPerformanceComparisonActivity.class);
+            startActivity(intent);
+        });
+
+        btnDebugOverlay.setOnClickListener(v -> {
+            Intent intent = new Intent(getContext(), DebugOverlayService.class);
+            getContext().startService(intent);
+            Toast.makeText(getContext(), "Debug overlay started", Toast.LENGTH_SHORT).show();
+        });
     }
 }

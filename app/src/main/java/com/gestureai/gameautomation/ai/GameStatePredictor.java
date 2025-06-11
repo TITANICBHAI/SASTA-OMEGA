@@ -260,4 +260,44 @@ public class GameStatePredictor {
             Log.e(TAG, "Error learning from prediction outcome", e);
         }
     }
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    public void cleanup() {
+        try {
+            if (predictionNetwork != null) {
+                predictionNetwork.clear();
+                predictionNetwork = null;
+            }
+            if (stateHistory != null) {
+                stateHistory.clear();
+            }
+            isInitialized = false;
+            Log.d(TAG, "GameStatePredictor cleaned up");
+        } catch (Exception e) {
+            Log.e(TAG, "Error during cleanup", e);
+        }
+    }
+
+    public float[] predictFutureState(float[] currentState, int stepsAhead) {
+        try {
+            if (!isInitialized || predictionNetwork == null) {
+                // Simple linear extrapolation fallback
+                float[] prediction = new float[currentState.length];
+                for (int i = 0; i < currentState.length; i++) {
+                    prediction[i] = currentState[i] * (1.0f + 0.1f * stepsAhead);
+                }
+                return prediction;
+            }
+
+            INDArray input = Nd4j.create(currentState).reshape(1, currentState.length, 1);
+            INDArray prediction = predictionNetwork.rnnTimeStep(input);
+            return prediction.toFloatVector();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error predicting future state", e);
+            return currentState.clone();
+        }
+    }
 }

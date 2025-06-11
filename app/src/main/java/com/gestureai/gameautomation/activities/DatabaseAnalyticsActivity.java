@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.gestureai.gameautomation.R;
 import com.gestureai.gameautomation.database.SessionDao;
-import com.gestureai.gameautomation.data.SessionData;
+import com.gestureai.gameautomation.database.SessionData;
 import com.gestureai.gameautomation.database.GestureDatabase;
 
 import java.util.List;

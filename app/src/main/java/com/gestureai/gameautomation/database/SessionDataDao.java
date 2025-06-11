@@ -1,64 +1,56 @@
 package com.gestureai.gameautomation.database;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-import androidx.room.Delete;
 import com.gestureai.gameautomation.data.SessionData;
+
 import java.util.List;
 
 @Dao
 public interface SessionDataDao {
     
+    @Query("SELECT * FROM session_data ORDER BY session_start_time DESC")
+    List<SessionData> getAllSessions();
+
+    @Query("SELECT * FROM session_data WHERE id = :sessionId")
+    SessionData getSessionById(long sessionId);
+
+    @Query("SELECT * FROM session_data WHERE game_type = :gameType ORDER BY session_start_time DESC")
+    List<SessionData> getSessionsByGameType(String gameType);
+
+    @Query("SELECT * FROM session_data WHERE automation_enabled = 1 ORDER BY session_start_time DESC")
+    List<SessionData> getAutomatedSessions();
+
+    @Query("SELECT * FROM session_data WHERE session_start_time >= :startTime AND session_start_time <= :endTime")
+    List<SessionData> getSessionsInTimeRange(long startTime, long endTime);
+
+    @Query("SELECT AVG(success_rate) FROM session_data WHERE game_type = :gameType AND automation_enabled = 1")
+    Float getAverageSuccessRateForGameType(String gameType);
+
+    @Query("SELECT COUNT(*) FROM session_data")
+    int getTotalSessionCount();
+
+    @Query("SELECT SUM(actions_performed) FROM session_data WHERE automation_enabled = 1")
+    int getTotalAutomatedActions();
+
+    @Query("SELECT * FROM session_data ORDER BY session_start_time DESC LIMIT :limit")
+    List<SessionData> getRecentSessions(int limit);
+
+    @Query("DELETE FROM session_data WHERE session_start_time < :cutoffTime")
+    void deleteOldSessions(long cutoffTime);
+
     @Insert
     long insertSession(SessionData session);
-    
+
     @Update
     void updateSession(SessionData session);
-    
+
     @Delete
     void deleteSession(SessionData session);
-    
-    @Query("SELECT * FROM sessions ORDER BY start_time DESC")
-    List<SessionData> getAllSessions();
-    
-    @Query("SELECT * FROM sessions ORDER BY start_time DESC LIMIT :limit")
-    List<SessionData> getLatestSessions(int limit);
-    
-    @Query("SELECT * FROM sessions WHERE id = :sessionId")
-    SessionData getSessionById(long sessionId);
-    
-    @Query("SELECT * FROM sessions WHERE game_type = :gameType ORDER BY start_time DESC")
-    List<SessionData> getSessionsByGameType(String gameType);
-    
-    @Query("SELECT * FROM sessions WHERE ai_strategy = :strategy ORDER BY start_time DESC")
-    List<SessionData> getSessionsByStrategy(String strategy);
-    
-    @Query("SELECT * FROM sessions WHERE start_time >= :startTime AND start_time <= :endTime ORDER BY start_time DESC")
-    List<SessionData> getSessionsByTimeRange(long startTime, long endTime);
-    
-    @Query("SELECT AVG(performance_rating) FROM sessions WHERE game_type = :gameType")
-    float getAveragePerformanceForGameType(String gameType);
-    
-    @Query("SELECT COUNT(*) FROM sessions")
-    int getSessionCount();
-    
-    @Query("SELECT * FROM sessions ORDER BY performance_rating DESC LIMIT :limit")
-    List<SessionData> getTopPerformingSessions(int limit);
-    
-    @Query("DELETE FROM sessions WHERE start_time < :cutoffTime")
-    void deleteOldSessions(long cutoffTime);
-    
-    @Query("DELETE FROM sessions")
+
+    @Query("DELETE FROM session_data")
     void deleteAllSessions();
-    
-    @Query("UPDATE sessions SET end_time = :endTime, total_actions = :totalActions, successful_actions = :successfulActions, performance_rating = :rating WHERE id = :sessionId")
-    void updateSessionStats(long sessionId, long endTime, int totalActions, int successfulActions, float rating);
-    
-    @Query("SELECT AVG(average_reaction_time) FROM sessions")
-    float getOverallAverageReactionTime();
-    
-    @Query("SELECT SUM(total_actions) FROM sessions")
-    int getTotalActionsPerformed();
 }

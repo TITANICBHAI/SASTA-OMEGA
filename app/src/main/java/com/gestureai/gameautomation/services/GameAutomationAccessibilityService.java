@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
-import com.gestureai.gameautomation.GameAction;
+import com.gestureai.gameautomation.data.GameAction;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -18,148 +18,12 @@ import java.util.concurrent.CompletableFuture;
 public class GameAutomationAccessibilityService extends AccessibilityService {
     private static final String TAG = "GameAutomationA11y";
     private static GameAutomationAccessibilityService instance;
-    
-    // Permission state monitoring
-    private final java.util.concurrent.atomic.AtomicBoolean isPermissionValid = new java.util.concurrent.atomic.AtomicBoolean(false);
-    private final java.util.concurrent.ScheduledExecutorService permissionMonitor = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
-    private volatile boolean isServiceActive = false;
-    private final java.util.List<PermissionStateListener> permissionListeners = new java.util.concurrent.CopyOnWriteArrayList<>();
-    
-    public interface PermissionStateListener {
-        void onPermissionRevoked();
-        void onPermissionRestored();
-        void onServiceDisabled();
-    }
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
         instance = this;
-        isServiceActive = true;
-        isPermissionValid.set(true);
-        
-        // Start permission monitoring
-        startPermissionMonitoring();
-        
         Log.d(TAG, "Game Automation Accessibility Service connected");
-        
-        // Notify listeners of permission restoration
-        for (PermissionStateListener listener : permissionListeners) {
-            try {
-                listener.onPermissionRestored();
-            } catch (Exception e) {
-                Log.e(TAG, "Error notifying permission restored", e);
-            }
-        }
-    }
-    
-    @Override
-    public boolean onUnbind(android.content.Intent intent) {
-        isServiceActive = false;
-        isPermissionValid.set(false);
-        
-        // Shutdown permission monitoring with proper cleanup
-        if (permissionMonitor != null && !permissionMonitor.isShutdown()) {
-            try {
-                permissionMonitor.shutdown();
-                if (!permissionMonitor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-                    permissionMonitor.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                permissionMonitor.shutdownNow();
-                Thread.currentThread().interrupt();
-                Log.w(TAG, "Permission monitor shutdown interrupted");
-            }
-        }
-        
-        // Notify listeners of service disable and clear list to prevent memory leaks
-        for (PermissionStateListener listener : permissionListeners) {
-            try {
-                listener.onServiceDisabled();
-            } catch (Exception e) {
-                Log.e(TAG, "Error notifying service disabled", e);
-            }
-        }
-        permissionListeners.clear();
-        
-        instance = null;
-        Log.d(TAG, "Game Automation Accessibility Service unbound");
-        return super.onUnbind(intent);
-    }
-    
-    private void startPermissionMonitoring() {
-        permissionMonitor.scheduleWithFixedDelay(() -> {
-            try {
-                checkPermissionState();
-            } catch (Exception e) {
-                Log.e(TAG, "Error in permission monitoring", e);
-            }
-        }, 5, 10, java.util.concurrent.TimeUnit.SECONDS);
-    }
-    
-    private void checkPermissionState() {
-        boolean currentPermissionState = isAccessibilityServiceEnabled();
-        boolean previousState = isPermissionValid.get();
-        
-        if (previousState && !currentPermissionState) {
-            // Permission was revoked
-            isPermissionValid.set(false);
-            Log.w(TAG, "Accessibility permission revoked");
-            
-            for (PermissionStateListener listener : permissionListeners) {
-                try {
-                    listener.onPermissionRevoked();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error notifying permission revoked", e);
-                }
-            }
-        } else if (!previousState && currentPermissionState) {
-            // Permission was restored
-            isPermissionValid.set(true);
-            Log.i(TAG, "Accessibility permission restored");
-            
-            for (PermissionStateListener listener : permissionListeners) {
-                try {
-                    listener.onPermissionRestored();
-                } catch (Exception e) {
-                    Log.e(TAG, "Error notifying permission restored", e);
-                }
-            }
-        }
-    }
-    
-    private boolean isAccessibilityServiceEnabled() {
-        try {
-            android.provider.Settings.Secure.getString(
-                getContentResolver(),
-                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            );
-            
-            // Check if our service is in the enabled list
-            String enabledServices = android.provider.Settings.Secure.getString(
-                getContentResolver(),
-                android.provider.Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            );
-            
-            if (enabledServices == null) return false;
-            
-            String serviceName = getPackageName() + "/" + getClass().getName();
-            return enabledServices.contains(serviceName);
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error checking accessibility service state", e);
-            return false;
-        }
-    }
-    
-    public void addPermissionStateListener(PermissionStateListener listener) {
-        if (listener != null && !permissionListeners.contains(listener)) {
-            permissionListeners.add(listener);
-        }
-    }
-    
-    public void removePermissionStateListener(PermissionStateListener listener) {
-        permissionListeners.remove(listener);
     }
 
     @Override
@@ -326,47 +190,8 @@ public class GameAutomationAccessibilityService extends AccessibilityService {
 
     @Override
     public void onDestroy() {
-        try {
-            // Clear static instance to prevent memory leaks
-            synchronized (instanceLock) {
-                instance = null;
-            }
-            
-            // Cancel any pending gesture operations
-            if (executorService != null && !executorService.isShutdown()) {
-                executorService.shutdownNow();
-                try {
-                    if (!executorService.awaitTermination(2, java.util.concurrent.TimeUnit.SECONDS)) {
-                        Log.w(TAG, "Executor did not terminate gracefully");
-                    }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            
-            Log.d(TAG, "Game Automation Accessibility Service destroyed with proper cleanup");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error during service cleanup", e);
-        } finally {
-            super.onDestroy();
-        }
-    }
-    
-    @Override
-    public void onServiceDisconnected() {
-        try {
-            // Clear static instance when service is disconnected
-            synchronized (instanceLock) {
-                instance = null;
-            }
-            
-            Log.d(TAG, "Game Automation Accessibility Service disconnected");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error during service disconnection", e);
-        } finally {
-            super.onServiceDisconnected();
-        }
+        super.onDestroy();
+        instance = null;
+        Log.d(TAG, "Game Automation Accessibility Service destroyed");
     }
 }

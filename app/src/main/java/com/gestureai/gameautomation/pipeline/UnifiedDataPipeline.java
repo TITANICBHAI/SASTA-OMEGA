@@ -9,7 +9,7 @@ import com.gestureai.gameautomation.data.UniversalGameState;
 import com.gestureai.gameautomation.data.GameContext;
 import com.gestureai.gameautomation.DetectedObject;
 import com.gestureai.gameautomation.ai.GameStrategyAgent;
-import com.gestureai.gameautomation.ObjectDetectionEngine;
+import com.gestureai.gameautomation.ai.ObjectDetectionEngine;
 import com.gestureai.gameautomation.services.ScreenCaptureService;
 import com.gestureai.gameautomation.services.TouchAutomationService;
 import com.gestureai.gameautomation.ObjectLabelerEngine;
@@ -63,7 +63,7 @@ public class UnifiedDataPipeline {
             objectLabeler = new ObjectLabelerEngine(context);
             
             // Initialize strategy agent
-            strategyAgent = new GameStrategyAgent(context);
+            strategyAgent = new GameStrategyAgent();
             
             Log.i(TAG, "Pipeline components initialized");
             

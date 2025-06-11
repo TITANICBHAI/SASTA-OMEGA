@@ -13,25 +13,6 @@ public class TouchExecutionManager {
     
     public TouchExecutionManager(Context context) {
         this.context = context;
-        // Wait for automation service to be available
-        initializeAutomationService();
-    }
-    
-    private void initializeAutomationService() {
-        new Thread(() -> {
-            try {
-                // Wait up to 5 seconds for service to become available
-                TouchAutomationService service = TouchAutomationService.waitForService(5000);
-                if (service != null) {
-                    setAutomationService(service);
-                    Log.d(TAG, "Automation service connected successfully");
-                } else {
-                    Log.e(TAG, "Failed to connect to automation service");
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error initializing automation service", e);
-            }
-        }).start();
     }
     
     public void setAutomationService(TouchAutomationService service) {

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import com.gestureai.gameautomation.services.TouchAutomationService;
-import com.gestureai.gameautomation.GestureRecognitionService;
+import com.gestureai.gameautomation.services.GestureRecognitionService;
 import com.gestureai.gameautomation.services.ScreenCaptureService;
 import com.gestureai.gameautomation.services.DebugOverlayService;
 import com.gestureai.gameautomation.services.VoiceCommandService;
@@ -23,9 +23,9 @@ import com.gestureai.gameautomation.ai.PPOAgent;
 import com.gestureai.gameautomation.ObjectDetectionEngine;
 import com.gestureai.gameautomation.GameAction;
 import com.gestureai.gameautomation.GameAutomationEngine;
-import com.gestureai.gameautomation.data.SessionData;
-import com.gestureai.gameautomation.database.dao.SessionDataDao;
-import com.gestureai.gameautomation.database.AppDatabase;
+import com.gestureai.gameautomation.database.SessionData;
+import com.gestureai.gameautomation.database.SessionDao;
+import com.gestureai.gameautomation.database.GestureDatabase;
 
 /**
  * Unified Service Coordinator - Central hub for all automation services
@@ -59,9 +59,9 @@ public class UnifiedServiceCoordinator {
     private Handler mainHandler;
     
     // Database integration
-    private AppDatabase database;
-    private SessionDataDao sessionDao;
-    private SessionEntity currentSession;
+    private GestureDatabase database;
+    private SessionDao sessionDao;
+    private SessionData currentSession;
     
     // Performance monitoring
     private AutomationPipelineMetrics metrics;
@@ -84,57 +84,6 @@ public class UnifiedServiceCoordinator {
         initializeAIComponents();
         
         Log.d(TAG, "Unified Service Coordinator initialized");
-    }
-    
-    public void cleanup() {
-        try {
-            // Stop automation
-            if (isAutomationActive.get()) {
-                stopAutomation();
-            }
-            
-            // Shutdown executors
-            shutdownExecutor(dataProcessingExecutor, "DataProcessing");
-            shutdownExecutor(aiInferenceExecutor, "AIInference");
-            shutdownExecutor(actionExecutionExecutor, "ActionExecution");
-            
-            // Cleanup AI components
-            if (strategyAgent != null) {
-                strategyAgent.cleanup();
-            }
-            if (dqnAgent != null) {
-                dqnAgent.cleanup();
-            }
-            if (ppoAgent != null) {
-                ppoAgent.cleanup();
-            }
-            
-            // Clear listeners
-            synchronized (stateListeners) {
-                stateListeners.clear();
-            }
-            
-            Log.d(TAG, "Unified Service Coordinator cleaned up");
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error during cleanup", e);
-        }
-    }
-    
-    private void shutdownExecutor(ExecutorService executor, String name) {
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                    Log.w(TAG, name + " executor forced shutdown");
-                }
-            } catch (InterruptedException e) {
-                executor.shutdownNow();
-                Thread.currentThread().interrupt();
-                Log.w(TAG, name + " executor shutdown interrupted");
-            }
-        }
     }
     
     private void initializeExecutors() {
@@ -161,7 +110,7 @@ public class UnifiedServiceCoordinator {
     
     private void initializeDatabase() {
         try {
-            database = AppDatabase.getDatabase(context);
+            database = GestureDatabase.getDatabase(context);
             sessionDao = database.sessionDao();
             Log.d(TAG, "Database initialized successfully");
         } catch (Exception e) {
@@ -171,9 +120,9 @@ public class UnifiedServiceCoordinator {
     
     private void initializeAIComponents() {
         try {
-            strategyAgent = GameStrategyAgent.getInstance(context);
-            dqnAgent = DQNAgent.getInstance(16, 8); // State size, action size
-            ppoAgent = PPOAgent.getInstance(16, 8);
+            strategyAgent = new GameStrategyAgent(context);
+            dqnAgent = new DQNAgent(16, 8); // State size, action size
+            ppoAgent = new PPOAgent(16, 8);
             detectionEngine = new ObjectDetectionEngine(context);
             
             // Connect AI agents for shared learning

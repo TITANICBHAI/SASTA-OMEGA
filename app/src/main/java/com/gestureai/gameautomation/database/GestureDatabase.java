@@ -9,18 +9,19 @@ import android.content.Context;
 import android.util.Log;
 
 @Database(
-    entities = {GestureData.class},
-    version = 3,
+    entities = {GestureData.class, SessionData.class},
+    version = 2,
     exportSchema = false
 )
 public abstract class GestureDatabase extends RoomDatabase {
     private static final String TAG = "GestureDatabase";
     
     public abstract GestureDao gestureDao();
+    public abstract SessionDao sessionDao();
 
     private static volatile GestureDatabase INSTANCE;
 
-    // Migration from version 1 to 2 (removed SessionData conflicts)
+    // Migration from version 1 to 2
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
@@ -55,24 +56,12 @@ public abstract class GestureDatabase extends RoomDatabase {
         }
     };
     
-    // Migration from version 2 to 3 (remove SessionData dependency)
+    // Migration strategy for future versions
     static final Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            try {
-                // Remove SessionData table references to prevent conflicts with AppDatabase
-                database.execSQL("DROP TABLE IF EXISTS session_data");
-                database.execSQL("DROP TABLE IF EXISTS sessions");
-                
-                // Ensure only gesture-specific tables remain
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_gesture_data_timestamp ON gesture_data (timestamp)");
-                database.execSQL("CREATE INDEX IF NOT EXISTS index_gesture_data_gesture_type ON gesture_data (gesture_type)");
-                
-                Log.d(TAG, "Database migrated from version 2 to 3 - SessionData conflicts resolved");
-            } catch (Exception e) {
-                Log.e(TAG, "Migration 2->3 error: " + e.getMessage());
-                throw e;
-            }
+            // Future migration logic will go here
+            Log.d(TAG, "Database migrated from version 2 to 3");
         }
     };
 

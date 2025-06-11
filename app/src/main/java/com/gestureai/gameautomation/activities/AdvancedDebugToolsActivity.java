@@ -19,10 +19,6 @@ import com.gestureai.gameautomation.ObjectDetectionEngine;
 import com.gestureai.gameautomation.PerformanceTracker;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Collections;
-import java.util.Map;
-import java.util.HashMap;
-import java.lang.ref.WeakReference;
 
 /**
  * Advanced debugging tools interface
@@ -41,21 +37,12 @@ public class AdvancedDebugToolsActivity extends AppCompatActivity {
     private ProgressBar progressBarProfiling;
     
     private DebugLogAdapter logAdapter;
-    private final List<DebugLogEntry> debugLogs = Collections.synchronizedList(new ArrayList<>());
+    private List<DebugLogEntry> debugLogs;
     private Handler debugHandler;
     private Runnable performanceUpdateRunnable;
-    private volatile boolean isProfilingActive = false;
-    private volatile boolean isDestroyed = false;
-    private final Object handlerLock = new Object();
+    private boolean isProfilingActive = false;
     private ObjectDetectionEngine detectionEngine;
     private PerformanceTracker performanceTracker;
-    private final Object debugLock = new Object();
-    
-    // Memory management for debug bitmaps
-    private final Map<String, WeakReference<Bitmap>> debugBitmaps = new HashMap<>();
-    
-    // Memory management constants
-    private static final int MAX_DEBUG_LOGS = 1000;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +54,7 @@ public class AdvancedDebugToolsActivity extends AppCompatActivity {
         setupListeners();
         initializeDebugging();
         
+        debugLogs = new ArrayList<>();
         debugHandler = new Handler(Looper.getMainLooper());
         
         Log.d(TAG, "Advanced debugging tools initialized");
@@ -403,7 +391,19 @@ public class AdvancedDebugToolsActivity extends AppCompatActivity {
         });
     }
     
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        
+        stopPerformanceMonitoring();
+        stopPerformanceProfiling();
+        
+        if (debugHandler != null) {
+            debugHandler.removeCallbacksAndMessages(null);
+        }
+        
+        Log.d(TAG, "Advanced debugging tools destroyed");
+    }
     
     // Debug log entry data class
     private static class DebugLogEntry {
@@ -457,85 +457,5 @@ public class AdvancedDebugToolsActivity extends AppCompatActivity {
                 textTimestamp = itemView.findViewById(android.R.id.text2);
             }
         }
-        }
     }
-    
-    @Override
-    protected void onDestroy() {
-        isDestroyed = true;
-        
-        // Stop profiling if active
-        if (isProfilingActive) {
-            stopPerformanceProfiling();
-        }
-        
-        // Clean up handler and runnables to prevent memory leaks
-        if (debugHandler != null) {
-            debugHandler.removeCallbacksAndMessages(null);
-            if (performanceUpdateRunnable != null) {
-                debugHandler.removeCallbacks(performanceUpdateRunnable);
-                performanceUpdateRunnable = null;
-            }
-            debugHandler = null;
-        }
-        
-        synchronized (debugLock) {
-            // Clean up debug logs to free memory
-            if (debugLogs != null) {
-                debugLogs.clear();
-            }
-            
-            // Clean up debug bitmaps to prevent memory leaks
-            for (WeakReference<Bitmap> bitmapRef : debugBitmaps.values()) {
-                Bitmap bitmap = bitmapRef.get();
-                if (bitmap != null && !bitmap.isRecycled()) {
-                    bitmap.recycle();
-                }
-            }
-            debugBitmaps.clear();
-            
-            // Clean up detection engine
-            if (detectionEngine != null) {
-                try {
-                    detectionEngine.cleanup();
-                } catch (Exception e) {
-                    Log.w(TAG, "Error cleaning up detection engine", e);
-                }
-                detectionEngine = null;
-            }
-            
-            // Clean up performance tracker
-            if (performanceTracker != null) {
-                performanceTracker = null;
-            }
-        }
-        
-        super.onDestroy();
-        Log.d(TAG, "AdvancedDebugToolsActivity destroyed with proper cleanup");
-    }
-    
-    /**
-     * Add debug log with bounds checking to prevent memory explosion
-     */
-    public void addDebugLog(String level, String message) {
-        if (isDestroyed) return;
-        
-        synchronized (debugLock) {
-            // Prevent memory explosion by maintaining bounds
-            if (debugLogs.size() >= MAX_DEBUG_LOGS) {
-                debugLogs.remove(0); // Remove oldest log
-            }
-            
-            DebugLogEntry entry = new DebugLogEntry(level, message, System.currentTimeMillis());
-            debugLogs.add(entry);
-            
-            // Update adapter on main thread
-            if (debugHandler != null && logAdapter != null) {
-                debugHandler.post(() -> {
-                    if (!isDestroyed && logAdapter != null) {
-                        logAdapter.notifyItemInserted(debugLogs.size() - 1);
-                    }
-                });
-            }
-        }
-    }
+}

@@ -1,80 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme -->
-    <style name="Theme.GestureAI" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorOnPrimary">@color/text_primary</item>
-        <item name="colorSecondary">@color/accent</item>
-        <item name="colorSecondaryVariant">@color/accent</item>
-        <item name="colorOnSecondary">@color/text_primary</item>
-        <item name="android:statusBarColor">@color/surface_dark</item>
-        <item name="android:navigationBarColor">@color/surface_dark</item>
-        <item name="android:windowBackground">@color/background_dark</item>
+    <style name="Theme.GestureAI" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <!-- No Action Bar theme -->
     <style name="Theme.GestureAI.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- Fullscreen theme -->
-    <style name="Theme.GestureAI.Fullscreen">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+    <!-- Card styles -->
+    <style name="CardStyle" parent="Theme.AppCompat">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:background">@drawable/card_background</item>
+        <item name="android:elevation">4dp</item>
     </style>
 
     <!-- Button styles -->
-    <style name="GestureAI.Button" parent="Widget.MaterialComponents.Button">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">14sp</item>
-        <item name="android:layout_marginVertical">4dp</item>
-        <item name="cornerRadius">8dp</item>
+    <style name="PrimaryButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:backgroundTint">@color/colorPrimary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="GestureAI.Button.Primary">
-        <item name="backgroundTint">@color/button_primary</item>
+    <style name="SecondaryButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:backgroundTint">@color/colorAccent</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
-    <style name="GestureAI.Button.Secondary">
-        <item name="backgroundTint">@color/button_secondary</item>
-    </style>
-
-    <style name="GestureAI.Button.Success">
-        <item name="backgroundTint">@color/button_success</item>
-    </style>
-
-    <style name="GestureAI.Button.Danger">
-        <item name="backgroundTint">@color/button_danger</item>
-    </style>
-
-    <!-- Card styles -->
-    <style name="GestureAI.Card" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">@color/card_background</item>
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">4dp</item>
-        <item name="android:layout_marginVertical">8dp</item>
+    <style name="DangerButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:backgroundTint">@color/error_red</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <!-- Text styles -->
-    <style name="GestureAI.Text" parent="android:Widget.TextView">
-        <item name="android:textColor">@color/text_primary</item>
+    <style name="HeaderText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:padding">16dp</item>
     </style>
 
-    <style name="GestureAI.Text.Title">
+    <style name="SubHeaderText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:padding">12dp</item>
     </style>
 
-    <style name="GestureAI.Text.Body">
+    <style name="BodyText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textColor">@color/dark_gray</item>
+        <item name="android:padding">8dp</item>
     </style>
 
-    <style name="GestureAI.Text.Caption">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/text_secondary</item>
+    <!-- Input styles -->
+    <style name="InputField" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:background">@drawable/input_background</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!-- Progress styles -->
+    <style name="ProgressBarStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">8dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:progressTint">@color/colorPrimary</item>
+        <item name="android:progressBackgroundTint">@color/light_gray</item>
+    </style>
+
+    <!-- Status indicator styles -->
+    <style name="StatusIndicator">
+        <item name="android:layout_width">12dp</item>
+        <item name="android:layout_height">12dp</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:background">@drawable/status_indicator</item>
     </style>
 </resources>

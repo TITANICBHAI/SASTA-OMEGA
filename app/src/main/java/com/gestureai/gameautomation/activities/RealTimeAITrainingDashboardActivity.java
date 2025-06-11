@@ -13,7 +13,7 @@ import com.gestureai.gameautomation.ai.DQNAgent;
 import com.gestureai.gameautomation.ai.PPOAgent;
 import com.gestureai.gameautomation.ai.PatternLearningEngine;
 import com.gestureai.gameautomation.managers.UnifiedServiceCoordinator;
-import com.gestureai.gameautomation.data.SessionData;
+import com.gestureai.gameautomation.database.SessionData;
 
 import java.util.ArrayList;
 import java.util.List;

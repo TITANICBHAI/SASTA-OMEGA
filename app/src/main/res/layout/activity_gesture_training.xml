@@ -1,200 +1,251 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/background_dark"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Header -->
-        <TextView
+        <!-- Camera Preview -->
+        <androidx.camera.view.PreviewView
+            android:id="@+id/preview_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Gesture Training"
-            android:textColor="@color/text_primary"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:layout_height="300dp"
             android:layout_marginBottom="16dp" />
 
-        <!-- Training Status -->
-        <androidx.cardview.widget.CardView
+        <!-- Gesture Visualization -->
+        <ImageView
+            android:id="@+id/iv_gesture_visualization"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#f0f0f0"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Detection Status -->
+        <TextView
+            android:id="@+id/tv_detected_gesture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+            android:text="No gesture detected"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Training Status"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
-
-                <TextView
-                    android:id="@+id/tv_training_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Status: Ready to Train"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="8dp" />
-
-                <ProgressBar
-                    android:id="@+id/pb_training_progress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:progress="0"
-                    android:progressTint="@color/accent_primary" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Gesture Recording -->
-        <androidx.cardview.widget.CardView
+        <TextView
+            android:id="@+id/tv_gesture_confidence"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Record Gestures"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
-
-                <EditText
-                    android:id="@+id/et_gesture_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Gesture Name"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_secondary"
-                    android:background="@color/input_background"
-                    android:padding="12dp"
-                    android:layout_marginBottom="12dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/btn_start_recording"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        android:text="Start Recording"
-                        android:backgroundTint="@color/button_success"
-                        android:textColor="@android:color/white" />
-
-                    <Button
-                        android:id="@+id/btn_stop_recording"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
-                        android:text="Stop Recording"
-                        android:backgroundTint="@color/button_danger"
-                        android:textColor="@android:color/white"
-                        android:enabled="false" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- Gesture List -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="@color/card_background"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Recorded Gestures"
-                    android:textColor="@color/text_primary"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="12dp" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_gestures"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:minHeight="200dp" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+            android:text="Confidence: 0%"
+            android:layout_marginBottom="16dp" />
 
         <!-- Training Controls -->
+        <EditText
+            android:id="@+id/et_gesture_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Gesture name (e.g., 'swipe_left')"
+            android:layout_marginBottom="8dp" />
+
+        <EditText
+            android:id="@+id/et_gesture_command"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Command to execute"
+            android:layout_marginBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinner_gesture_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Recording Controls -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
 
             <Button
-                android:id="@+id/btn_train_model"
+                android:id="@+id/btn_start_recording"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:text="Train Model"
-                android:backgroundTint="@color/button_primary"
-                android:textColor="@android:color/white" />
+                android:text="Start Recording"
+                android:layout_marginEnd="8dp" />
 
             <Button
-                android:id="@+id/btn_test_model"
+                android:id="@+id/btn_stop_recording"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:text="Test Model"
-                android:backgroundTint="@color/button_secondary"
-                android:textColor="@android:color/white" />
+                android:text="Stop Recording"
+                android:enabled="false"
+                android:layout_marginStart="8dp" />
 
         </LinearLayout>
 
-    </LinearLayout>
+        <!-- Training Progress -->
+        <TextView
+            android:id="@+id/tv_training_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ready for training"
+            android:layout_marginBottom="8dp" />
 
+        <TextView
+            android:id="@+id/tv_samples_collected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Samples: 0"
+            android:layout_marginBottom="8dp" />
+
+        <ProgressBar
+            android:id="@+id/pb_training_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btn_save_gesture"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save Gesture"
+                android:enabled="false"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btn_test_gesture"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Test Recognition"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Advanced Settings -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Advanced Settings"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <Switch
+            android:id="@+id/switch_realtime_detection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Real-time Detection"
+            android:layout_marginBottom="8dp" />
+
+        <Switch
+            android:id="@+id/switch_hand_tracking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hand Tracking"
+            android:layout_marginBottom="8dp" />
+
+        <Switch
+            android:id="@+id/switch_pose_detection"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pose Detection"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Sensitivity Controls -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sensitivity"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <SeekBar
+                android:id="@+id/seekbar_sensitivity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="50" />
+
+            <TextView
+                android:id="@+id/tv_sensitivity_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.50"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Min Confidence"
+            android:layout_marginBottom="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <SeekBar
+                android:id="@+id/seekbar_min_confidence"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="70" />
+
+            <TextView
+                android:id="@+id/tv_min_confidence_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.70"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Trained Gestures List -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Trained Gestures"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tv_accuracy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Overall Accuracy: 0%"
+            android:layout_marginBottom="8dp" />
+
+        <ListView
+            android:id="@+id/lv_trained_gestures"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#f8f8f8" />
+
+    </LinearLayout>
 </ScrollView>

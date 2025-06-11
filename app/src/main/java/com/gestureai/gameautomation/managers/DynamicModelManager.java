@@ -39,91 +39,13 @@ public class DynamicModelManager {
     private Map<String, Interpreter> loadedModels;
     private Map<String, ModelInfo> availableModels;
     
-    // Critical: TensorFlow Lite version compatibility and degradation controls
-    private volatile boolean tfliteDeprecated = true; // Degrade TFLite in favor of ND4J
-    private volatile boolean forceND4JFallback = true;
-    private static final String SUPPORTED_TFLITE_VERSION = "2.8.0";
-    private volatile boolean modelVersionValidated = false;
-    
     public DynamicModelManager(Context context) {
         this.context = context;
         this.preferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         this.loadedModels = new HashMap<>();
         this.availableModels = new HashMap<>();
         
-        // Critical: Initialize with TFLite degraded in favor of ND4J stability
-        validateTensorFlowLiteCompatibility();
         initializeModelDirectories();
-        
-        Log.i(TAG, "DynamicModelManager initialized with TFLite degraded, ND4J prioritized");
-    }
-    
-    /**
-     * Critical: Validate TensorFlow Lite version compatibility and degrade if needed
-     */
-    private void validateTensorFlowLiteCompatibility() {
-        try {
-            // Force degradation for stability as requested
-            if (forceND4JFallback) {
-                tfliteDeprecated = true;
-                modelVersionValidated = false;
-                Log.w(TAG, "TensorFlow Lite forcibly degraded - using ND4J/DL4J for stability");
-                return;
-            }
-            
-            // Version validation (currently bypassed due to degradation)
-            String currentVersion = getTensorFlowLiteVersion();
-            if (currentVersion == null || !isVersionCompatible(currentVersion, SUPPORTED_TFLITE_VERSION)) {
-                tfliteDeprecated = true;
-                modelVersionValidated = false;
-                Log.w(TAG, "TensorFlow Lite version incompatible: " + currentVersion + 
-                      ", degrading to ND4J/DL4J");
-            } else {
-                modelVersionValidated = true;
-                Log.d(TAG, "TensorFlow Lite version validated: " + currentVersion);
-            }
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error validating TensorFlow Lite compatibility, forcing degradation", e);
-            tfliteDeprecated = true;
-            forceND4JFallback = true;
-            modelVersionValidated = false;
-        }
-    }
-    
-    private String getTensorFlowLiteVersion() {
-        try {
-            // Attempt to get TensorFlow Lite version through reflection
-            // This is a simplified approach - in production would use proper version detection
-            return "2.12.0"; // Simulated current version
-        } catch (Exception e) {
-            Log.w(TAG, "Could not determine TensorFlow Lite version", e);
-            return null;
-        }
-    }
-    
-    private boolean isVersionCompatible(String current, String required) {
-        try {
-            String[] currentParts = current.split("\\.");
-            String[] requiredParts = required.split("\\.");
-            
-            for (int i = 0; i < Math.min(currentParts.length, requiredParts.length); i++) {
-                int currentNum = Integer.parseInt(currentParts[i]);
-                int requiredNum = Integer.parseInt(requiredParts[i]);
-                
-                if (currentNum < requiredNum) {
-                    return false;
-                } else if (currentNum > requiredNum) {
-                    return true;
-                }
-            }
-            
-            return currentParts.length >= requiredParts.length;
-            
-        } catch (Exception e) {
-            Log.w(TAG, "Error comparing versions", e);
-            return false;
-        }
     }
     
     /**
@@ -464,5 +386,24 @@ public class DynamicModelManager {
     public enum ModelLocation {
         ASSETS,
         EXTERNAL
+    }
+    /**
+     * Train model with custom data (placeholder implementation)
+     */
+    public void trainModel(String modelName, float[] state, float[] targets) {
+        try {
+            Interpreter interpreter = loadedModels.get(modelName);
+            if (interpreter == null) {
+                Log.w(TAG, "Cannot train - model not loaded: " + modelName);
+                return;
+            }
+
+            // Placeholder: TensorFlow Lite doesn't support training on Android
+            // In production, you'd send data to a server for training
+            Log.d(TAG, "Training data logged for model: " + modelName);
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error in training placeholder", e);
+        }
     }
 }

@@ -3,79 +3,39 @@ package com.gestureai.gameautomation;
 import android.graphics.Rect;
 
 /**
- * Enhanced DetectedObject with reasoning integration and semantic analysis
+ * Represents a detected object in the game screen
  */
 public class DetectedObject {
-    private String label;
-    private float confidence;
-    private Rect bounds;
-    private String action;
-    private String description;
-    
-    // Enhanced reasoning integration
-    private boolean reasoningRelevance = false;
-    private String reasoningContext;
-    private float semanticRelevanceScore = 0.0f;
-    private String strategicImportance;
-    private long timestamp;
+    public final String name;
+    public final Rect boundingRect;
+    public final float confidence;
+    public final String action;
+    public final String description;
 
-    public DetectedObject(String label, float confidence, Rect bounds) {
-        this.label = label;
-        this.confidence = confidence;
-        this.bounds = bounds;
-        this.timestamp = System.currentTimeMillis();
-    }
 
-    public DetectedObject(String label, Rect boundingRect, float confidence,
+    public DetectedObject(String name, Rect boundingRect, float confidence,
                           String action, String description) {
-        this.label = label;
-        this.bounds = boundingRect;
+        this.name = name;
+        this.boundingRect = boundingRect;
         this.confidence = confidence;
         this.action = action;
+
         this.description = description;
-        this.timestamp = System.currentTimeMillis();
     }
 
-    // Basic getters and setters
-    public String getLabel() { return label; }
-    public String getName() { return label; } // Backward compatibility
-    public float getConfidence() { return confidence; }
-    public Rect getBounds() { return bounds; }
-    public Rect getBoundingRect() { return bounds; } // Backward compatibility
-    public String getAction() { return action; }
-    public String getDescription() { return description; }
-    public long getTimestamp() { return timestamp; }
-
-    // Enhanced reasoning getters and setters
-    public boolean isReasoningRelevance() { return reasoningRelevance; }
-    public void setReasoningRelevance(boolean relevant) { this.reasoningRelevance = relevant; }
-    public String getReasoningContext() { return reasoningContext; }
-    public void setReasoningContext(String context) { this.reasoningContext = context; }
-    public float getSemanticRelevanceScore() { return semanticRelevanceScore; }
-    public void setSemanticRelevanceScore(float score) { this.semanticRelevanceScore = score; }
-    public String getStrategicImportance() { return strategicImportance; }
-    public void setStrategicImportance(String importance) { this.strategicImportance = importance; }
-    
-    public void setConfidence(float confidence) { this.confidence = confidence; }
-    public void setLabel(String label) { this.label = label; }
-    public void setBounds(Rect bounds) { this.bounds = bounds; }
-    public void setAction(String action) { this.action = action; }
-    public void setDescription(String description) { this.description = description; }
+    public String getName() {
+        return name;
+    }
 
     public static class Builder {
-        private String label;
+        private String name;
         private Rect boundingRect;
         private float confidence;
         private String action;
         private String description;
 
         public Builder setName(String name) {
-            this.label = name;
-            return this;
-        }
-
-        public Builder setLabel(String label) {
-            this.label = label;
+            this.name = name;
             return this;
         }
 
@@ -100,7 +60,7 @@ public class DetectedObject {
         }
 
         public DetectedObject build() {
-            return new DetectedObject(label, boundingRect, confidence, action, description);
+            return new DetectedObject(name, boundingRect, confidence, action, description);
         }
     }
 

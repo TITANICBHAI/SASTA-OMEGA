@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.gestureai.gameautomation.GameObjectTemplate;
+import com.gestureai.gameautomation.data.GameObjectTemplate;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

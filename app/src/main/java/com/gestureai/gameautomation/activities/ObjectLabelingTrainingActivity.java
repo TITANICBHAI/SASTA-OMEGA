@@ -19,17 +19,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.gestureai.gameautomation.R;
-import com.gestureai.gameautomation.GameObjectTemplate;
+import com.gestureai.gameautomation.data.GameObjectTemplate;
 import com.gestureai.gameautomation.services.ScreenCaptureService;
 import com.gestureai.gameautomation.utils.StorageHelper;
-import com.gestureai.gameautomation.ai.InverseReinforcementLearner;
-import com.gestureai.gameautomation.ai.GameStrategyAgent;
-import com.gestureai.gameautomation.ai.DQNAgent;
-import com.gestureai.gameautomation.ai.PPOAgent;
-import com.gestureai.gameautomation.utils.NLPProcessor;
-import com.gestureai.gameautomation.models.GameFrame;
-import com.gestureai.gameautomation.models.ActionIntent;
-import com.gestureai.gameautomation.GameAutomationEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,12 +36,10 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
 
     private ImageView ivScreenshot;
     private EditText etObjectLabel;
-    private EditText etUserExplanation;
     private TextView tvLabelsCount;
     private TextView tvObjectTypes;
     private Button btnCapture;
     private Button btnSaveLabel;
-    private Button btnTrainWithIRL;
     private Button btnExportDataset;
     private Button btnImportDataset;
     private View drawingOverlay;
@@ -59,12 +49,6 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
     private int totalLabels = 0;
     private RectF currentBoundingBox;
     private Paint boundingBoxPaint;
-    
-    // AI Training Components
-    private InverseReinforcementLearner irlLearner;
-    private GameStrategyAgent strategyAgent;
-    private NLPProcessor nlpProcessor;
-    private GameAutomationEngine automationEngine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +57,6 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
         
         initializeViews();
         initializePaint();
-        initializeAIComponents();
         setupEventListeners();
         loadExistingData();
         
@@ -83,12 +66,10 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
     private void initializeViews() {
         ivScreenshot = findViewById(R.id.iv_screenshot);
         etObjectLabel = findViewById(R.id.et_object_label);
-        etUserExplanation = findViewById(R.id.et_user_explanation);
         tvLabelsCount = findViewById(R.id.tv_labels_count);
         tvObjectTypes = findViewById(R.id.tv_object_types);
         btnCapture = findViewById(R.id.btn_capture_screenshot);
         btnSaveLabel = findViewById(R.id.btn_save_label);
-        btnTrainWithIRL = findViewById(R.id.btn_train_with_irl);
         btnExportDataset = findViewById(R.id.btn_export_dataset);
         btnImportDataset = findViewById(R.id.btn_import_dataset);
         drawingOverlay = findViewById(R.id.drawing_overlay);
@@ -102,29 +83,10 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
         boundingBoxPaint.setStyle(Paint.Style.STROKE);
         boundingBoxPaint.setStrokeWidth(4f);
     }
-    
-    private void initializeAIComponents() {
-        try {
-            // Initialize AI training components
-            irlLearner = new InverseReinforcementLearner(this);
-            nlpProcessor = new NLPProcessor(this);
-            automationEngine = GameAutomationEngine.getInstance();
-            
-            if (automationEngine != null) {
-                strategyAgent = automationEngine.getGameStrategyAgent();
-            }
-            
-            Log.d(TAG, "AI components initialized successfully");
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize AI components", e);
-            Toast.makeText(this, "AI initialization failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
 
     private void setupEventListeners() {
         btnCapture.setOnClickListener(v -> requestScreenCapture());
         btnSaveLabel.setOnClickListener(v -> saveLabeledObject());
-        btnTrainWithIRL.setOnClickListener(v -> trainWithUserExplanation());
         btnExportDataset.setOnClickListener(v -> exportDataset());
         btnImportDataset.setOnClickListener(v -> importDataset());
 
@@ -178,85 +140,6 @@ public class ObjectLabelingTrainingActivity extends AppCompatActivity {
         ivScreenshot.setImageBitmap(currentScreenshot);
         
         Toast.makeText(this, "Screenshot captured", Toast.LENGTH_SHORT).show();
-    }
-    
-    /**
-     * NEW: Train AI directly with user explanation instead of just exporting JSON
-     */
-    private void trainWithUserExplanation() {
-        String objectLabel = etObjectLabel.getText().toString().trim();
-        String userExplanation = etUserExplanation.getText().toString().trim();
-        
-        if (objectLabel.isEmpty() || userExplanation.isEmpty()) {
-            Toast.makeText(this, "Please provide both object label and explanation", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        
-        if (currentScreenshot == null || currentBoundingBox == null) {
-            Toast.makeText(this, "Please capture screenshot and draw bounding box first", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        
-        try {
-            // 1. Process user explanation with NLP
-            ActionIntent actionIntent = nlpProcessor.processNaturalLanguageCommand(userExplanation);
-            
-            // 2. Create GameFrame from current data
-            GameFrame gameFrame = new GameFrame();
-            gameFrame.screenshot = currentScreenshot;
-            gameFrame.timestamp = System.currentTimeMillis();
-            gameFrame.frameIndex = totalLabels + 1;
-            gameFrame.userExplanation = userExplanation;
-            gameFrame.objectLabel = objectLabel;
-            gameFrame.boundingBox = currentBoundingBox;
-            
-            // 3. Feed directly to IRL for learning
-            if (irlLearner != null) {
-                // Learn reward function from user's explanation
-                List<GameFrame> trajectory = new ArrayList<>();
-                trajectory.add(gameFrame);
-                
-                irlLearner.learnFromUserExplanation(trajectory, userExplanation, actionIntent);
-                Log.d(TAG, "IRL learning from user explanation: " + userExplanation);
-            }
-            
-            // 4. Update strategy agent with new understanding
-            if (strategyAgent != null) {
-                strategyAgent.updateStrategyFromUserInput(gameFrame, actionIntent, userExplanation);
-                Log.d(TAG, "Strategy agent updated with user reasoning");
-            }
-            
-            // 5. Train ND4J networks with explanation data
-            if (automationEngine != null) {
-                DQNAgent dqnAgent = automationEngine.getDQNAgent();
-                PPOAgent ppoAgent = automationEngine.getPPOAgent();
-                
-                if (dqnAgent != null) {
-                    dqnAgent.trainFromUserExplanation(gameFrame, actionIntent);
-                }
-                
-                if (ppoAgent != null) {
-                    ppoAgent.trainFromUserExplanation(gameFrame, actionIntent);
-                }
-            }
-            
-            // 6. Clear inputs and update UI
-            etObjectLabel.setText("");
-            etUserExplanation.setText("");
-            totalLabels++;
-            updateTrainingStats();
-            
-            Toast.makeText(this, "AI trained with your explanation successfully!", Toast.LENGTH_LONG).show();
-            
-        } catch (Exception e) {
-            Log.e(TAG, "Error training AI with user explanation", e);
-            Toast.makeText(this, "Training failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-    }
-    
-    private void updateTrainingStats() {
-        tvLabelsCount.setText(String.valueOf(totalLabels));
-        // Update other training statistics as needed
     }
 
     private void handleTouchForBoundingBox(android.view.MotionEvent event) {

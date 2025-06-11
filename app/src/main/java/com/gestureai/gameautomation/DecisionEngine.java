@@ -702,4 +702,26 @@ public class DecisionEngine {
 
         return recent;
     }
+    public boolean isInitialized() {
+        return isInitialized;
+    }
+
+    public void cleanup() {
+        try {
+            if (decisionNetwork != null) {
+                decisionNetwork.clear();
+                decisionNetwork = null;
+            }
+            if (decisionHistory != null) {
+                decisionHistory.clear();
+            }
+            if (actionWeights != null) {
+                actionWeights.clear();
+            }
+            isInitialized = false;
+            Log.d(TAG, "DecisionEngine cleaned up");
+        } catch (Exception e) {
+            Log.e(TAG, "Error during cleanup", e);
+        }
+    }
 }

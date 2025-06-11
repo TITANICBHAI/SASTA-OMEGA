@@ -42,19 +42,15 @@ public class SystemIntegrationCoordinator implements ServiceCommunicationProtoco
     private ScreenCaptureService screenCapture;
     private TouchAutomationService touchAutomation;
     
-    // System state with failure recovery
+    // System state
     private UniversalGameState currentGameState;
     private AtomicBoolean systemRunning = new AtomicBoolean(false);
     private ExecutorService executor;
     private SystemMetrics metrics;
-    private volatile boolean systemHealthy = true;
-    private int consecutiveFailures = 0;
-    private static final int MAX_CONSECUTIVE_FAILURES = 5;
-    private final Object coordinatorLock = new Object();
     
     private SystemIntegrationCoordinator(Context context) {
         this.context = context;
-        this.executor = Executors.newFixedThreadPool(4); // Limit thread pool to prevent exhaustion
+        this.executor = Executors.newCachedThreadPool();
         this.metrics = new SystemMetrics();
         
         initializeSystem();
@@ -79,8 +75,8 @@ public class SystemIntegrationCoordinator implements ServiceCommunicationProtoco
             // Initialize data pipeline
             dataPipeline = new UnifiedDataPipeline(context);
             
-            // Initialize AI components with proper context
-            strategyAgent = GameStrategyAgent.getInstance(context);
+            // Initialize AI components
+            strategyAgent = new GameStrategyAgent();
             objectDetection = new ObjectDetectionEngine(context);
             objectLabeler = new ObjectLabelerEngine(context);
             
@@ -140,24 +136,6 @@ public class SystemIntegrationCoordinator implements ServiceCommunicationProtoco
             // Stop data pipeline
             if (dataPipeline != null) {
                 dataPipeline.stopPipeline();
-            }
-            
-            // Cleanup AI components
-            if (strategyAgent != null) {
-                strategyAgent.cleanup();
-            }
-            
-            // Shutdown executor
-            if (executor != null && !executor.isShutdown()) {
-                executor.shutdown();
-                try {
-                    if (!executor.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-                        executor.shutdownNow();
-                    }
-                } catch (InterruptedException e) {
-                    executor.shutdownNow();
-                    Thread.currentThread().interrupt();
-                }
             }
             
             communicationProtocol.updateServiceState("SystemIntegrationCoordinator", 

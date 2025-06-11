@@ -15,7 +15,7 @@ import java.util.HashMap;
 import com.gestureai.gameautomation.ai.DQNAgent;
 import com.gestureai.gameautomation.ai.PPOAgent;
 import com.gestureai.gameautomation.ai.GameStrategyAgent;
-import com.gestureai.gameautomation.data.SessionData;
+import com.gestureai.gameautomation.database.SessionData;
 
 /**
  * AI Training Control Manager - Provides unified control over all AI training processes

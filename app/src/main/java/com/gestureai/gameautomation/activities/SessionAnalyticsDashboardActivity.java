@@ -11,7 +11,7 @@ import com.gestureai.gameautomation.ai.PPOAgent;
 import com.gestureai.gameautomation.ai.ZoneTracker;
 import com.gestureai.gameautomation.WeaponRecognizer;
 import com.gestureai.gameautomation.TeamClassifier;
-import com.gestureai.gameautomation.data.SessionData;
+import com.gestureai.gameautomation.database.SessionData;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -62,21 +62,10 @@ public class SessionAnalyticsDashboardActivity extends AppCompatActivity {
     private List<SessionData> filteredSessions;
     private AIPerformanceMetrics aiMetrics;
     
-    // Critical: Memory leak prevention
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    private java.util.concurrent.ExecutorService backgroundExecutor;
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_analytics_dashboard);
-        
-        // Initialize executor service for background operations
-        backgroundExecutor = java.util.concurrent.Executors.newFixedThreadPool(2, r -> {
-            Thread t = new Thread(r, "SessionAnalytics-BG");
-            t.setDaemon(true);
-            return t;
-        });
         
         initializeViews();
         initializeAIComponents();
@@ -483,43 +472,6 @@ public class SessionAnalyticsDashboardActivity extends AppCompatActivity {
                 tvTimestamp = itemView.findViewById(R.id.tv_timestamp);
             }
         }
-    }
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
-        
-        // Shutdown executor service
-        if (backgroundExecutor != null && !backgroundExecutor.isShutdown()) {
-            backgroundExecutor.shutdown();
-            try {
-                if (!backgroundExecutor.awaitTermination(2000, java.util.concurrent.TimeUnit.MILLISECONDS)) {
-                    backgroundExecutor.shutdownNow();
-                    android.util.Log.w(TAG, "Background executor forced shutdown");
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                backgroundExecutor.shutdownNow();
-            }
-        }
-        
-        // Clear AI component references to prevent memory leaks
-        dqnAgent = null;
-        ppoAgent = null;
-        zoneTracker = null;
-        weaponRecognizer = null;
-        teamClassifier = null;
-        
-        // Clear data references
-        sessionAdapter = null;
-        allSessions = null;
-        filteredSessions = null;
-        aiMetrics = null;
-        
-        android.util.Log.d(TAG, "SessionAnalyticsDashboardActivity destroyed - memory cleaned up");
     }
     
     // AI Performance metrics data class

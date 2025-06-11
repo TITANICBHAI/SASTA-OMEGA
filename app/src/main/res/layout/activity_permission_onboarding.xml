@@ -1,130 +1,104 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="@color/background_primary">
+    android:padding="16dp"
+    android:fillViewport="true">
 
-    <!-- App Logo/Title -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AI Game Automation"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_primary"
-        android:textAlignment="center"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Welcome! Let's set up the required permissions."
-        android:textSize="16sp"
-        android:textColor="@color/text_secondary"
-        android:textAlignment="center"
-        android:layout_marginBottom="48dp" />
-
-    <!-- Permission Cards -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp">
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:text="GestureAI Game Automation"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Accessibility Service"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Required for automated touch interactions and game control."
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="12dp" />
-
-            <Button
-                android:id="@+id/btn_enable_accessibility"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Enable Accessibility"
-                android:backgroundTint="@color/primary" />
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp">
-
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:text="This app requires several permissions to function properly. Please grant all permissions to continue."
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="System Overlay"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/text_primary"
-                android:layout_marginBottom="8dp" />
+        <TextView
+            android:id="@+id/tv_permission_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Checking permissions..."
+            android:textSize="14sp"
+            android:background="@drawable/background_rounded_black"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp"
+            android:fontFamily="monospace" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Required for displaying controls over other apps."
-                android:textColor="@color/text_secondary"
-                android:layout_marginBottom="12dp" />
+        <Button
+            android:id="@+id/btn_grant_basic_permissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Grant Basic Permissions"
+            android:layout_marginBottom="8dp"
+            android:padding="12dp" />
 
-            <Button
-                android:id="@+id/btn_enable_overlay"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Enable Overlay"
-                android:backgroundTint="@color/primary" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Grants camera, microphone, and storage access"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/darker_gray" />
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+        <Button
+            android:id="@+id/btn_grant_overlay_permission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Grant Overlay Permission"
+            android:layout_marginBottom="8dp"
+            android:padding="12dp" />
 
-    <!-- Status -->
-    <TextView
-        android:id="@+id/tv_permission_status"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Please grant the required permissions to continue."
-        android:textAlignment="center"
-        android:textColor="@color/text_secondary"
-        android:layout_marginBottom="24dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Allows app to draw over other apps for game controls"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/darker_gray" />
 
-    <!-- Continue Button -->
-    <Button
-        android:id="@+id/btn_continue"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Continue to App"
-        android:backgroundTint="@color/accent_primary"
-        android:enabled="false"
-        android:layout_marginTop="auto" />
+        <Button
+            android:id="@+id/btn_open_accessibility_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Accessibility Service"
+            android:layout_marginBottom="8dp"
+            android:padding="12dp" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Required for touch automation and game control"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:textColor="@android:color/darker_gray" />
+
+        <Button
+            android:id="@+id/btn_continue_to_app"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Continue to App"
+            android:enabled="false"
+            android:padding="12dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</ScrollView>

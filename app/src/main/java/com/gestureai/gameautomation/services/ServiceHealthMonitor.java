@@ -22,15 +22,6 @@ public class ServiceHealthMonitor {
     private final Handler mainHandler;
     private final AtomicBoolean isMonitoring;
     
-    // Recursive loop prevention
-    private final java.util.concurrent.ConcurrentHashMap<String, Long> lastHealthCheckTime = new java.util.concurrent.ConcurrentHashMap<>();
-    private final java.util.concurrent.ConcurrentHashMap<String, Integer> recursiveCallDepth = new java.util.concurrent.ConcurrentHashMap<>();
-    private final java.util.concurrent.atomic.AtomicBoolean circuitBreakerOpen = new java.util.concurrent.atomic.AtomicBoolean(false);
-    private volatile long circuitBreakerOpenTime = 0;
-    private static final int MAX_RECURSIVE_DEPTH = 3;
-    private static final long MIN_HEALTH_CHECK_INTERVAL = 1000; // 1 second minimum
-    private static final long CIRCUIT_BREAKER_RESET_TIME = 30000; // 30 seconds
-    
     // Health check intervals
     private static final long HEALTH_CHECK_INTERVAL = 5000; // 5 seconds
     private static final long SERVICE_TIMEOUT = 10000; // 10 seconds
@@ -133,86 +124,12 @@ public class ServiceHealthMonitor {
     }
     
     private void checkServiceHealth(ServiceHealth health) {
-        // Check circuit breaker state
-        if (circuitBreakerOpen.get()) {
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - circuitBreakerOpenTime < CIRCUIT_BREAKER_RESET_TIME) {
-                return; // Skip health checks while circuit breaker is open
-            } else {
-                // Try to reset circuit breaker
-                circuitBreakerOpen.set(false);
-                Log.i(TAG, "Circuit breaker reset - resuming health checks");
-            }
-        }
-        
-        // Check for recursive call prevention
-        if (!canPerformHealthCheck(health.serviceName)) {
-            return;
-        }
-        
         try {
-            incrementRecursiveDepth(health.serviceName);
             ServiceStatus newStatus = evaluateServiceStatus(health.serviceName);
             updateServiceHealth(health, newStatus, null);
             
         } catch (Exception e) {
             updateServiceHealth(health, ServiceStatus.FAILED, e.getMessage());
-            checkCircuitBreakerTrigger();
-        } finally {
-            decrementRecursiveDepth(health.serviceName);
-        }
-    }
-    
-    private boolean canPerformHealthCheck(String serviceName) {
-        long currentTime = System.currentTimeMillis();
-        
-        // Check minimum interval between health checks
-        Long lastCheck = lastHealthCheckTime.get(serviceName);
-        if (lastCheck != null && (currentTime - lastCheck) < MIN_HEALTH_CHECK_INTERVAL) {
-            return false;
-        }
-        
-        // Check recursive call depth
-        Integer depth = recursiveCallDepth.get(serviceName);
-        if (depth != null && depth >= MAX_RECURSIVE_DEPTH) {
-            Log.w(TAG, "Recursive call depth exceeded for service: " + serviceName);
-            return false;
-        }
-        
-        lastHealthCheckTime.put(serviceName, currentTime);
-        return true;
-    }
-    
-    private void incrementRecursiveDepth(String serviceName) {
-        recursiveCallDepth.compute(serviceName, (key, value) -> value == null ? 1 : value + 1);
-    }
-    
-    private void decrementRecursiveDepth(String serviceName) {
-        recursiveCallDepth.compute(serviceName, (key, value) -> {
-            if (value == null || value <= 1) {
-                return null; // Remove from map if depth becomes 0 or negative
-            }
-            return value - 1;
-        });
-    }
-    
-    private void checkCircuitBreakerTrigger() {
-        // Count recent failures across all services
-        long currentTime = System.currentTimeMillis();
-        int recentFailures = 0;
-        
-        for (ServiceHealth health : serviceHealthMap.values()) {
-            if (health.status == ServiceStatus.FAILED && 
-                (currentTime - health.lastHealthCheck) < 30000) { // Within 30 seconds
-                recentFailures++;
-            }
-        }
-        
-        // Open circuit breaker if too many recent failures
-        if (recentFailures >= 3 && !circuitBreakerOpen.get()) {
-            circuitBreakerOpen.set(true);
-            circuitBreakerOpenTime = currentTime;
-            Log.w(TAG, "Circuit breaker opened due to " + recentFailures + " recent failures");
         }
     }
     

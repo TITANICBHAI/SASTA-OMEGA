@@ -35,15 +35,6 @@ public class UniversalGameState {
     public float fps;
     public boolean isStable;
     
-    // Additional fields for AI compatibility
-    public boolean powerUpActive;
-    public float speedLevel;
-    public float powerLevel;
-    public float difficultyLevel;
-    public int consecutiveSuccess;
-    public int nearestObstacleX;
-    public int nearestObstacleY;
-    
     public UniversalGameState() {
         // Initialize with default values
         this.playerX = 0f;
@@ -65,13 +56,6 @@ public class UniversalGameState {
         this.timestamp = System.currentTimeMillis();
         this.fps = 60f;
         this.isStable = true;
-        this.powerUpActive = false;
-        this.speedLevel = 1.0f;
-        this.powerLevel = 1.0f;
-        this.difficultyLevel = 0.5f;
-        this.consecutiveSuccess = 0;
-        this.nearestObstacleX = 0;
-        this.nearestObstacleY = 0;
     }
     
     public UniversalGameState(float playerX, float playerY, float healthLevel, 
@@ -140,14 +124,7 @@ public class UniversalGameState {
             nearestObjectY / (float)screenHeight, // Normalized nearest object Y
             actionConfidence,                // Last action confidence
             fps / 60f,                       // Normalized FPS
-            isStable ? 1f : 0f,             // Stability flag
-            powerUpActive ? 1f : 0f,        // Power-up status
-            speedLevel,                     // Speed level
-            powerLevel,                     // Power level
-            difficultyLevel,                // Difficulty level
-            consecutiveSuccess / 10f,       // Normalized success count
-            nearestObstacleX / (float)screenWidth,  // Normalized obstacle X
-            nearestObstacleY / (float)screenHeight  // Normalized obstacle Y
+            isStable ? 1f : 0f              // Stability flag
         };
     }
     
@@ -175,13 +152,6 @@ public class UniversalGameState {
         clone.timestamp = this.timestamp;
         clone.fps = this.fps;
         clone.isStable = this.isStable;
-        clone.powerUpActive = this.powerUpActive;
-        clone.speedLevel = this.speedLevel;
-        clone.powerLevel = this.powerLevel;
-        clone.difficultyLevel = this.difficultyLevel;
-        clone.consecutiveSuccess = this.consecutiveSuccess;
-        clone.nearestObstacleX = this.nearestObstacleX;
-        clone.nearestObstacleY = this.nearestObstacleY;
         return clone;
     }
     

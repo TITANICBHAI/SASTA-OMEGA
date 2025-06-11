@@ -5,34 +5,23 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import androidx.annotation.Nullable;
-
 import com.gestureai.gameautomation.ai.PatternLearningEngine;
-import com.gestureai.gameautomation.managers.CameraManager;
 import com.gestureai.gameautomation.managers.MLModelManager;
-import com.gestureai.gameautomation.managers.CameraResourceManager;
-import com.gestureai.gameautomation.models.GestureResult;
-import com.gestureai.gameautomation.models.HandLandmarks;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * Enhanced Gesture Recognition Service with camera integration and singleton pattern
- * Provides callback interfaces for UI components and gesture automation
+ * Service for continuous gesture recognition and processing
+ * Provides callback interfaces for UI components
  */
 public class GestureRecognitionService extends Service {
     private static final String TAG = "GestureRecognitionService";
-    private static volatile GestureRecognitionService instance;
-    private static final Object instanceLock = new Object();
     
     private final IBinder binder = new LocalBinder();
     private PatternLearningEngine patternEngine;
-    private CameraManager cameraManager;
     private MLModelManager modelManager;
-    private CameraResourceManager cameraResourceManager;
     private ExecutorService executorService;
     private boolean isRecognizing = false;
-    private boolean hasCameraAccess = false;
     
     // Service configuration
     private float sensitivity = 0.7f;
@@ -52,27 +41,6 @@ public class GestureRecognitionService extends Service {
     
     private GestureCallback gestureCallback;
     
-    // Thread-safe singleton methods
-    public static GestureRecognitionService getInstance() {
-        return instance;
-    }
-    
-    public static GestureRecognitionService getInstanceSafe() {
-        synchronized (instanceLock) {
-            if (instance == null) {
-                Log.w(TAG, "GestureRecognitionService instance not yet created");
-                return null;
-            }
-            return instance;
-        }
-    }
-    
-    public static boolean isInstanceAvailable() {
-        synchronized (instanceLock) {
-            return instance != null;
-        }
-    }
-    
     public class LocalBinder extends Binder {
         public GestureRecognitionService getService() {
             return GestureRecognitionService.this;
@@ -82,24 +50,12 @@ public class GestureRecognitionService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        synchronized (instanceLock) {
-            instance = this;
-        }
         
-        // Initialize managers
-        cameraResourceManager = CameraResourceManager.getInstance(this);
-        cameraManager = new CameraManager(this);
         patternEngine = new PatternLearningEngine(this);
         modelManager = new MLModelManager(this);
         executorService = Executors.newCachedThreadPool();
         
-        try {
-            modelManager.initialize();
-        } catch (Exception e) {
-            Log.e(TAG, "Failed to initialize ML Model Manager", e);
-        }
-        
-        Log.d(TAG, "Enhanced GestureRecognitionService created");
+        Log.d(TAG, "GestureRecognitionService created");
     }
     
     @Override
@@ -115,7 +71,6 @@ public class GestureRecognitionService extends Service {
         return START_STICKY;
     }
     
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
@@ -123,16 +78,8 @@ public class GestureRecognitionService extends Service {
     
     public void startGestureRecognition() {
         if (!isRecognizing) {
-            // Request camera access through resource manager
-            hasCameraAccess = cameraResourceManager.requestCameraAccess("GestureRecognitionService");
-            
-            if (!hasCameraAccess) {
-                Log.w(TAG, "Camera access denied - another service is using camera");
-                return;
-            }
-            
             isRecognizing = true;
-            Log.d(TAG, "Starting enhanced gesture recognition with camera integration");
+            Log.d(TAG, "Starting gesture recognition");
             
             // Initialize gesture recognition pipeline
             initializeRecognitionPipeline();
@@ -143,17 +90,6 @@ public class GestureRecognitionService extends Service {
         if (isRecognizing) {
             isRecognizing = false;
             Log.d(TAG, "Stopping gesture recognition");
-            
-            // Stop camera manager
-            if (cameraManager != null) {
-                cameraManager.stopCamera();
-            }
-            
-            // Release camera access
-            if (hasCameraAccess && cameraResourceManager != null) {
-                cameraResourceManager.releaseCameraAccess("GestureRecognitionService");
-                hasCameraAccess = false;
-            }
             
             // Cleanup recognition pipeline
             cleanupRecognitionPipeline();
@@ -213,51 +149,8 @@ public class GestureRecognitionService extends Service {
             modelManager.loadGestureModel();
         }
         
-        // Start camera with hand landmark detection
-        if (cameraManager != null && hasCameraAccess) {
-            cameraManager.startCamera(new CameraManager.CameraCallback() {
-                @Override
-                public void onHandLandmarksDetected(HandLandmarks landmarks) {
-                    processHandLandmarks(landmarks);
-                }
-                
-                @Override
-                public void onError(String error) {
-                    Log.e(TAG, "Camera error: " + error);
-                    stopGestureRecognition();
-                }
-            });
-        }
-        
         // Start continuous recognition loop
         executorService.execute(this::recognitionLoop);
-    }
-    
-    private void processHandLandmarks(HandLandmarks landmarks) {
-        if (modelManager != null && modelManager.isInitialized()) {
-            GestureResult result = modelManager.classifyGesture(landmarks);
-            
-            if (result.isValid()) {
-                // Send gesture result to automation engine
-                broadcastGestureResult(result);
-                
-                // Also trigger callback for UI components
-                if (gestureCallback != null) {
-                    gestureCallback.onGestureDetected(result.getType(), result.getConfidence());
-                }
-            }
-        }
-    }
-    
-    private void broadcastGestureResult(GestureResult result) {
-        Intent intent = new Intent("com.gestureai.GESTURE_DETECTED");
-        intent.putExtra("gesture_type", result.getType());
-        intent.putExtra("confidence", result.getConfidence());
-        intent.putExtra("center_x", result.getCenterPoint().x);
-        intent.putExtra("center_y", result.getCenterPoint().y);
-        
-        sendBroadcast(intent);
-        Log.d(TAG, "Broadcasted gesture: " + result.toString());
     }
     
     private void cleanupRecognitionPipeline() {
@@ -296,42 +189,14 @@ public class GestureRecognitionService extends Service {
         
         stopGestureRecognition();
         
-        // Comprehensive cleanup to prevent memory leaks
-        synchronized (instanceLock) {
-            instance = null;
-        }
-        
-        if (executorService != null && !executorService.isShutdown()) {
+        if (executorService != null) {
             executorService.shutdown();
-            try {
-                if (!executorService.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
-                    executorService.shutdownNow();
-                }
-            } catch (InterruptedException e) {
-                executorService.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
         }
         
         if (patternEngine != null) {
-            patternEngine.cleanup();
-            patternEngine = null;
+            patternEngine.shutdown();
         }
         
-        if (cameraManager != null) {
-            cameraManager = null;
-        }
-        
-        if (modelManager != null) {
-            modelManager = null;
-        }
-        
-        if (cameraResourceManager != null) {
-            cameraResourceManager = null;
-        }
-        
-        gestureCallback = null;
-        
-        Log.d(TAG, "GestureRecognitionService destroyed with proper cleanup");
+        Log.d(TAG, "GestureRecognitionService destroyed");
     }
 }

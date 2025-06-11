@@ -49,15 +49,10 @@ public class AIModelManagementActivity extends Activity {
     
     // Backend Components
     private MLModelManager mlModelManager;
-    private AIModelLoadingManager aiModelLoadingManager;
+    private AIModelLoadingManager modelLoadingManager;
     private DQNAgent dqnAgent;
     private PPOAgent ppoAgent;
-    private PatternLearningEngine patternLearningEngine;
-    
-    // Critical: Memory leak prevention
-    private java.util.concurrent.ExecutorService backgroundExecutor;
-    private final java.util.concurrent.atomic.AtomicBoolean isDestroyed = new java.util.concurrent.atomic.AtomicBoolean(false);
-    private final java.util.List<java.util.concurrent.Future<?>> activeTasks = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private PatternLearningEngine patternEngine;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +60,6 @@ public class AIModelManagementActivity extends Activity {
         
         try {
             setContentView(R.layout.activity_ai_training_dashboard);
-            
-            // Critical: Initialize executor service for background tasks
-            backgroundExecutor = java.util.concurrent.Executors.newFixedThreadPool(2, r -> {
-                Thread t = new Thread(r, "AIModelManagement-BG");
-                t.setDaemon(true);
-                return t;
-            });
             
             initializeComponents();
             setupModelManagement();
@@ -278,27 +266,18 @@ public class AIModelManagementActivity extends Activity {
             updateModelStatus("Optimizing model...");
             pbTrainingProgress.setProgress(0);
             
-            // Critical fix: Use executor instead of raw thread to prevent memory leaks
-            if (backgroundExecutor != null && !backgroundExecutor.isShutdown()) {
-                java.util.concurrent.Future<?> optimizationTask = backgroundExecutor.submit(() -> {
-                    try {
-                        // Check if activity is still alive before each progress update
-                        for (int i = 0; i <= 100 && !isDestroyed.get() && !Thread.currentThread().isInterrupted(); i += 10) {
-                            final int progress = i;
-                            
-                            // Use weak reference to prevent activity retention
-                            java.lang.ref.WeakReference<AIModelManagementActivity> activityRef = new java.lang.ref.WeakReference<>(AIModelManagementActivity.this);
-                            runOnUiThread(() -> {
-                                AIModelManagementActivity activity = activityRef.get();
-                                if (activity != null && !activity.isDestroyed() && pbTrainingProgress != null) {
-                                    pbTrainingProgress.setProgress(progress);
-                                    if (tvTrainingProgress != null) {
-                                        tvTrainingProgress.setText("Optimization progress: " + progress + "%");
-                                    }
-                                }
-                            });
-                            Thread.sleep(500);
-                        }
+            // Start model optimization in background
+            new Thread(() -> {
+                try {
+                    // Simulate optimization progress
+                    for (int i = 0; i <= 100; i += 10) {
+                        final int progress = i;
+                        runOnUiThread(() -> {
+                            pbTrainingProgress.setProgress(progress);
+                            tvTrainingProgress.setText("Optimization progress: " + progress + "%");
+                        });
+                        Thread.sleep(500);
+                    }
                     
                     runOnUiThread(() -> {
                         updateModelStatus("Model optimization complete");
@@ -306,70 +285,14 @@ public class AIModelManagementActivity extends Activity {
                     });
                     
                 } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    java.lang.ref.WeakReference<AIModelManagementActivity> activityRef = new java.lang.ref.WeakReference<>(AIModelManagementActivity.this);
-                    runOnUiThread(() -> {
-                        AIModelManagementActivity activity = activityRef.get();
-                        if (activity != null && !activity.isDestroyed()) {
-                            activity.updateModelStatus("Optimization interrupted");
-                        }
-                    });
-                } catch (Exception e) {
-                    Log.e(TAG, "Optimization error", e);
-                    java.lang.ref.WeakReference<AIModelManagementActivity> activityRef = new java.lang.ref.WeakReference<>(AIModelManagementActivity.this);
-                    runOnUiThread(() -> {
-                        AIModelManagementActivity activity = activityRef.get();
-                        if (activity != null && !activity.isDestroyed()) {
-                            activity.updateModelStatus("Optimization failed");
-                        }
-                    });
+                    runOnUiThread(() -> updateModelStatus("Optimization interrupted"));
                 }
-            });
-            activeTasks.add(optimizationTask);
+            }).start();
             
         } catch (Exception e) {
             Log.e(TAG, "Error optimizing model", e);
             updateModelStatus("Error optimizing model");
         }
-    }
-    
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        
-        // Critical: Prevent memory leaks during activity destruction
-        isDestroyed.set(true);
-        
-        // Cancel all active background tasks
-        for (java.util.concurrent.Future<?> task : activeTasks) {
-            if (task != null && !task.isDone()) {
-                task.cancel(true);
-            }
-        }
-        activeTasks.clear();
-        
-        // Shutdown executor service
-        if (backgroundExecutor != null && !backgroundExecutor.isShutdown()) {
-            backgroundExecutor.shutdown();
-            try {
-                if (!backgroundExecutor.awaitTermination(2000, java.util.concurrent.TimeUnit.MILLISECONDS)) {
-                    backgroundExecutor.shutdownNow();
-                    Log.w(TAG, "Background executor forced shutdown");
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                backgroundExecutor.shutdownNow();
-            }
-        }
-        
-        // Clear AI component references to prevent memory leaks
-        mlModelManager = null;
-        aiModelLoadingManager = null;
-        dqnAgent = null;
-        ppoAgent = null;
-        patternLearningEngine = null;
-        
-        Log.d(TAG, "AIModelManagementActivity destroyed - memory cleaned up");
     }
     
     private void updateHyperparameter(String parameter, Object value) {

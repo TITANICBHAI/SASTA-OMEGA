@@ -279,9 +279,7 @@ public class ComprehensiveAnalyticsActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        switchRealTimeMonitoring.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switchRealTimeMonitoring.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isRealTimeMonitoring = isChecked;
             if (isChecked) {
                 startRealTimeMonitoring();
@@ -290,18 +288,8 @@ public class ComprehensiveAnalyticsActivity extends AppCompatActivity {
             }
         });
 
-        btnExportData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exportAnalyticsData();
-            }
-        });
-        btnClearHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearSessionHistory();
-            }
-        });
+        btnExportData.setOnClickListener(v -> exportAnalyticsData());
+        btnClearHistory.setOnClickListener(v -> clearSessionHistory());
     }
 
     private void loadAnalyticsData() {
@@ -454,22 +442,14 @@ public class ComprehensiveAnalyticsActivity extends AppCompatActivity {
     private void startRealTimeMonitoring() {
         if (!isRealTimeMonitoring) return;
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        new Thread(() -> {
             while (isRealTimeMonitoring && !isFinishing()) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        updateMonitoringData();
-                    }
-                });
+                runOnUiThread(() -> updateMonitoringData());
                 try {
                     Thread.sleep(1000); // Update every second
                 } catch (InterruptedException e) {
                     break;
                 }
-            }
             }
         }).start();
     }

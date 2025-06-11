@@ -27,23 +27,15 @@ public class FragmentNavigationManager {
     
     private void initializeFragments() {
         try {
-            // Core fragments - using index-based keys for MainActivity compatibility
-            fragmentCache.put("0", new DashboardFragment());
-            fragmentCache.put("1", new AutoPlayFragment());
-            fragmentCache.put("2", new AnalyticsFragment());
-            fragmentCache.put("3", new TrainingFragment());
-            fragmentCache.put("4", new SettingsFragment());
-            fragmentCache.put("5", new DebugFragment());
-            fragmentCache.put("6", new MoreFragment());
-            
-            // Named access for convenience
-            fragmentCache.put("dashboard", fragmentCache.get("0"));
-            fragmentCache.put("auto_play", fragmentCache.get("1"));
-            fragmentCache.put("analytics", fragmentCache.get("2"));
-            fragmentCache.put("training", fragmentCache.get("3"));
-            fragmentCache.put("settings", fragmentCache.get("4"));
-            fragmentCache.put("debug", fragmentCache.get("5"));
-            fragmentCache.put("more", fragmentCache.get("6"));
+            // Core fragments
+            fragmentCache.put("gesture_controller", new GestureControllerFragment());
+            fragmentCache.put("auto_play", new AutoPlayFragment());
+            fragmentCache.put("screen_monitor", new ScreenMonitorFragment());
+            fragmentCache.put("analytics", new AnalyticsFragment());
+            fragmentCache.put("training", new TrainingFragment());
+            fragmentCache.put("settings", new SettingsFragment());
+            fragmentCache.put("debug", new DebugFragment());
+            fragmentCache.put("more", new MoreFragment());
             
             Log.d(TAG, "Fragment cache initialized with " + fragmentCache.size() + " fragments");
         } catch (Exception e) {

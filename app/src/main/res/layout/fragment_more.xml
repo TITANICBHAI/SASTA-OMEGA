@@ -3,20 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_primary"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@color/light_gray">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Additional Tools -->
+        <TextView
+            style="@style/HeaderText"
+            android:text="More Features" />
+
+        <!-- Game Strategy Configuration -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -26,176 +30,28 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Additional Tools"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="16dp" />
-
-                <Button
-                    android:id="@+id/btn_gesture_controller"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gesture Controller"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_screen_monitor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Screen Monitor"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_performance_monitor"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Performance Monitor"
-                    android:backgroundTint="@color/primary" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Advanced Features -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
+                    style="@style/SubHeaderText"
+                    android:text="@string/strategy_config_title" />
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Advanced Features"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
-
-                <Button
-                    android:id="@+id/btn_advanced_training"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Advanced Training"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_neural_network_config"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Neural Network Config"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_advanced_debugging"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Advanced Debugging"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_ai_training_dashboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="AI Training Dashboard"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_ai_comparison"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="AI Performance Comparison"
-                    android:backgroundTint="@color/primary" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Analytics & Configuration -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Analytics & Configuration"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
-
-                <Button
-                    android:id="@+id/btn_comprehensive_analytics"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Comprehensive Analytics"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
+                    style="@style/BodyText"
+                    android:text="Configure game-specific strategies and detection zones for optimal automation" />
 
                 <Button
                     android:id="@+id/btn_game_strategy_config"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Game Strategy Config"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_object_labeling"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Object Labeling"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_gesture_training"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gesture Training"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_neural_network_training"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Neural Network Training"
-                    android:backgroundTint="@color/primary" />
+                    style="@style/PrimaryButton"
+                    android:text="Configure Strategies" />
 
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
-        <!-- Settings & Configuration -->
+        <!-- Screen Monitor -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:cardCornerRadius="12dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -205,45 +61,28 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Settings & Configuration"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
+                    style="@style/SubHeaderText"
+                    android:text="Screen Monitor" />
+
+                <TextView
+                    style="@style/BodyText"
+                    android:text="Monitor screen captures and real-time object detection" />
 
                 <Button
-                    android:id="@+id/btn_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Settings"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_advanced_settings"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Advanced Settings"
-                    android:backgroundTint="@color/accent_secondary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_voice_command_config"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Voice Command Config"
-                    android:backgroundTint="@color/primary" />
+                    android:id="@+id/btn_screen_monitor"
+                    style="@style/PrimaryButton"
+                    android:text="Open Screen Monitor" />
 
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
-        <!-- Help & Support -->
+        <!-- Gesture Controller -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
             app:cardElevation="4dp">
 
             <LinearLayout
@@ -253,30 +92,166 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Help & Support"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:layout_marginBottom="12dp" />
+                    style="@style/SubHeaderText"
+                    android:text="Gesture Controller" />
+
+                <TextView
+                    style="@style/BodyText"
+                    android:text="Control automation through hand gestures and camera input" />
 
                 <Button
-                    android:id="@+id/btn_user_guide"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="User Guide"
-                    android:backgroundTint="@color/primary"
-                    android:layout_marginBottom="8dp" />
-
-                <Button
-                    android:id="@+id/btn_troubleshooting"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Troubleshooting"
-                    android:backgroundTint="@color/accent_secondary" />
+                    android:id="@+id/btn_gesture_controller"
+                    style="@style/PrimaryButton"
+                    android:text="Open Gesture Controller" />
 
             </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Advanced Tools -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Advanced Tools" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_strategy_testing"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Strategy Testing" />
+
+                    <Button
+                        android:id="@+id/btn_zone_editor"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Zone Editor" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_session_replay"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Session Replay" />
+
+                    <Button
+                        android:id="@+id/btn_team_interface"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Team Interface" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Game Elements -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Game Element Configuration" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_weapon_strategy"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Weapon Strategy" />
+
+                    <Button
+                        android:id="@+id/btn_minimap_overlay"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Minimap Overlay" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Settings -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    style="@style/SubHeaderText"
+                    android:text="Settings" />
+
+                <TextView
+                    style="@style/BodyText"
+                    android:text="Configure app preferences and basic automation settings" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_settings"
+                        style="@style/PrimaryButton"
+                        android:layout_weight="1"
+                        android:text="Basic Settings" />
+
+                    <Button
+                        android:id="@+id/btn_advanced_settings"
+                        style="@style/SecondaryButton"
+                        android:layout_weight="1"
+                        android:text="Advanced Settings" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
         </androidx.cardview.widget.CardView>
 
     </LinearLayout>

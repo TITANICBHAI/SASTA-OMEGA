@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import com.gestureai.gameautomation.services.*;
-import com.gestureai.gameautomation.services.ServiceHealthMonitor;
 import com.gestureai.gameautomation.activities.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,15 +19,11 @@ public class ServiceIntegrationManager {
     private Context context;
     private Map<String, Boolean> serviceStates;
     private Map<String, Class<?>> activityRegistry;
-    private Map<String, Integer> serviceRetryCount;
-    private static final int MAX_SERVICE_RETRIES = 3;
-    private final Object serviceLock = new Object();
     
     private ServiceIntegrationManager(Context context) {
         this.context = context.getApplicationContext();
         this.serviceStates = new HashMap<>();
         this.activityRegistry = new HashMap<>();
-        this.serviceRetryCount = new HashMap<>();
         
         initializeServiceStates();
         registerActivities();
@@ -41,33 +36,6 @@ public class ServiceIntegrationManager {
             instance = new ServiceIntegrationManager(context);
         }
         return instance;
-    }
-    
-    /**
-     * Cleanup resources and reset singleton instance to prevent memory leaks
-     */
-    public static synchronized void cleanup() {
-        if (instance != null) {
-            try {
-                // Clear all collections
-                if (instance.serviceStates != null) {
-                    instance.serviceStates.clear();
-                }
-                if (instance.activityRegistry != null) {
-                    instance.activityRegistry.clear();
-                }
-                
-                // Clear context reference
-                instance.context = null;
-                
-                Log.d(TAG, "ServiceIntegrationManager cleaned up successfully");
-            } catch (Exception e) {
-                Log.e(TAG, "Error during ServiceIntegrationManager cleanup", e);
-            } finally {
-                // Reset singleton instance
-                instance = null;
-            }
-        }
     }
     
     private void initializeServiceStates() {
@@ -102,65 +70,45 @@ public class ServiceIntegrationManager {
     }
     
     /**
-     * Start a service with proper integration and retry logic
+     * Start a service with proper integration
      */
     public boolean startService(String serviceName) {
-        synchronized (serviceLock) {
-            try {
-                // Check retry count
-                int retries = serviceRetryCount.getOrDefault(serviceName, 0);
-                if (retries >= MAX_SERVICE_RETRIES) {
-                    Log.e(TAG, "Service " + serviceName + " exceeded max retries: " + retries);
-                    return false;
-                }
-                
-                Intent serviceIntent = createServiceIntent(serviceName);
-                
-                if (serviceIntent != null) {
-                    // Attempt to start service
-                    android.content.ComponentName result = context.startService(serviceIntent);
-                    if (result != null) {
-                        serviceStates.put(serviceName, true);
-                        serviceRetryCount.put(serviceName, 0); // Reset retry count on success
-                        Log.d(TAG, "Started service: " + serviceName);
-                        return true;
-                    } else {
-                        // Service failed to start, increment retry count
-                        serviceRetryCount.put(serviceName, retries + 1);
-                        Log.w(TAG, "Failed to start service: " + serviceName + ", retry count: " + (retries + 1));
-                    }
-                }
-                
-            } catch (SecurityException e) {
-                Log.e(TAG, "Security exception starting service: " + serviceName, e);
-                serviceRetryCount.put(serviceName, serviceRetryCount.getOrDefault(serviceName, 0) + 1);
-            } catch (Exception e) {
-                Log.e(TAG, "Error starting service: " + serviceName, e);
-                serviceRetryCount.put(serviceName, serviceRetryCount.getOrDefault(serviceName, 0) + 1);
+        try {
+            Intent serviceIntent = null;
+            
+            switch (serviceName) {
+                case "TouchAutomationService":
+                    serviceIntent = new Intent(context, TouchAutomationService.class);
+                    break;
+                case "GestureRecognitionService":
+                    serviceIntent = new Intent(context, GestureRecognitionService.class);
+                    break;
+                case "ScreenCaptureService":
+                    serviceIntent = new Intent(context, ScreenCaptureService.class);
+                    break;
+                case "OverlayService":
+                    serviceIntent = new Intent(context, OverlayService.class);
+                    break;
+                case "VoiceCommandService":
+                    serviceIntent = new Intent(context, VoiceCommandService.class);
+                    break;
+                case "DebugOverlayService":
+                    serviceIntent = new Intent(context, DebugOverlayService.class);
+                    break;
             }
             
-            return false;
+            if (serviceIntent != null) {
+                context.startService(serviceIntent);
+                serviceStates.put(serviceName, true);
+                Log.d(TAG, "Started service: " + serviceName);
+                return true;
+            }
+            
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting service: " + serviceName, e);
         }
-    }
-    
-    private Intent createServiceIntent(String serviceName) {
-        switch (serviceName) {
-            case "TouchAutomationService":
-                return new Intent(context, TouchAutomationService.class);
-            case "GestureRecognitionService":
-                return new Intent(context, GestureRecognitionService.class);
-            case "ScreenCaptureService":
-                return new Intent(context, ScreenCaptureService.class);
-            case "OverlayService":
-                return new Intent(context, OverlayService.class);
-            case "VoiceCommandService":
-                return new Intent(context, VoiceCommandService.class);
-            case "DebugOverlayService":
-                return new Intent(context, DebugOverlayService.class);
-            default:
-                Log.w(TAG, "Unknown service name: " + serviceName);
-                return null;
-        }
+        
+        return false;
     }
     
     /**

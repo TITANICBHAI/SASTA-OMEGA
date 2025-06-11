@@ -62,22 +62,9 @@ public class GestureAIApplication extends Application {
     private void initializeGameAutomationEngine() {
         try {
             GameAutomationEngine.initialize(this);
-            
-            // Initialize error recovery system
-            com.gestureai.gameautomation.utils.ErrorRecoveryManager.getInstance(this);
-            
-            Log.d(TAG, "GameAutomationEngine and ErrorRecovery initialized successfully");
+            Log.d(TAG, "GameAutomationEngine initialized successfully");
         } catch (Exception e) {
             Log.e(TAG, "Failed to initialize GameAutomationEngine", e);
-            
-            // Attempt basic recovery
-            try {
-                com.gestureai.gameautomation.utils.ErrorRecoveryManager errorRecovery = 
-                    com.gestureai.gameautomation.utils.ErrorRecoveryManager.getInstance(this);
-                errorRecovery.performFullRecovery();
-            } catch (Exception recoveryError) {
-                Log.e(TAG, "Critical: Error recovery also failed", recoveryError);
-            }
         }
     }
     
