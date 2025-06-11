@@ -1,57 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.gestureai.gameautomation">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Camera and microphone permissions -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <!-- Storage permissions - Android 14 compliant -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" 
-        android:maxSdkVersion="29" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-    <!-- System overlay and accessibility permissions -->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
-
-    <!-- Network permissions for analytics -->
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- Foreground service permissions - Android 14 compliant -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
-
-    <!-- Wake lock for continuous operation -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.VIBRATE" />
     
-    <!-- Android 14 compliant permissions -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    
-    <!-- Screen capture will use MediaProjectionManager API - no manifest permission needed -->
-    
-    <!-- Query packages permission with proper justification -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
-    
-    <!-- ML Kit and accessibility -->
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
-    
-    <!-- Feature declarations -->
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <!-- Features -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
 
     <application
         android:name=".GestureAIApplication"
@@ -61,13 +27,20 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/Theme.GestureAI"
-        tools:targetApi="34">
+        tools:targetApi="31">
+
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.GestureAI">
+            <!-- Remove intent filter from MainActivity -->
+        </activity>
 
         <!-- Permission Onboarding Activity (Launch Activity) -->
         <activity
             android:name=".activities.PermissionOnboardingActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.GestureAI.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -75,187 +48,201 @@
             </intent-filter>
         </activity>
 
-        <!-- Main Activity -->
+        <!-- Setup Wizard Activity -->
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.SetupWizardActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.GestureAI.NoActionBar" />
 
-        <!-- Settings Activity -->
+
+
+        <!-- Database Analytics Activities -->
+        <activity
+            android:name=".activities.DatabaseAnalyticsActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AnalyticsActivity" />
+
+        <!-- AI Model Management Activities -->
+        <activity
+            android:name=".activities.AIModelManagementActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".activities.ModelManagementActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AIModelManagementActivity" />
+
+        <!-- Performance Monitoring Activities -->
+        <activity
+            android:name=".activities.PerformanceMonitoringDashboardActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity" />
+
+        <activity
+            android:name=".activities.RealTimePerformanceDashboardActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.PerformanceMonitoringDashboardActivity" />
+
+        <activity
+            android:name=".activities.RealTimePerformanceMonitorActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.PerformanceMonitoringDashboardActivity" />
+
+        <!-- Voice Command Configuration -->
+        <activity
+            android:name=".activities.VoiceCommandConfigurationActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.SettingsActivity" />
+
+        <!-- Advanced Training Activities -->
+        <activity
+            android:name=".activities.AdvancedGestureTrainingActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
+
+        <activity
+            android:name=".activities.GestureTrainingActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
+
+        <activity
+            android:name=".activities.ObjectLabelingActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
+
+        <activity
+            android:name=".activities.ObjectLabelingTrainingActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.ObjectLabelingActivity" />
+
+        <!-- CRITICAL: Enhanced Expert Demonstration System -->
+        <activity
+            android:name=".activities.ExpertDemonstrationActivity"
+            android:exported="false"
+            android:label="Expert Demonstration System"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- CRITICAL: Adaptive Workflow Orchestration System -->
+        <activity
+            android:name=".activities.AWOSActivity"
+            android:exported="false"
+            android:label="Workflow Orchestration"
+            android:parentActivityName=".MainActivity" />
+
+        <!-- Settings Activities -->
         <activity
             android:name=".activities.SettingsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
-        <!-- Analytics Activity -->
+        <activity
+            android:name=".activities.AdvancedSettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.SettingsActivity" />
+
+        <!-- Analytics Activities -->
         <activity
             android:name=".activities.AnalyticsActivity"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
 
-        <!-- Advanced Gesture Training Activity -->
         <activity
-            android:name=".activities.AdvancedGestureTrainingActivity"
+            android:name=".activities.ComprehensiveAnalyticsActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
+            android:parentActivityName=".activities.AnalyticsActivity" />
+
+        <!-- AI Training Activities -->
+        <activity
+            android:name=".activities.AITrainingDashboardActivity"
+            android:exported="false"
             android:parentActivityName=".MainActivity" />
 
-        <!-- Real-time Analytics Activity -->
-        <activity
-            android:name=".activities.RealTimeAnalyticsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Game Strategy Configuration Activity -->
-        <activity
-            android:name=".activities.GameStrategyConfigurationActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Neural Network Training Activity -->
         <activity
             android:name=".activities.NeuralNetworkTrainingActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
 
-        <!-- New Dashboard Activities -->
-        <activity
-            android:name=".activities.RealTimePerformanceDashboardActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <activity
-            android:name=".activities.TrainingProgressVisualizerActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
+        <!-- Game Configuration Activities -->
         <activity
             android:name=".activities.GameConfigurationWizardActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- AI Training Dashboard Activity -->
-        <activity
-            android:name=".activities.RealTimeAITrainingDashboardActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Object Labeling Training Activity -->
-        <activity
-            android:name=".activities.ObjectLabelingTrainingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".activities.GestureSequenceBuilderActivity"
+            android:name=".activities.GameStrategyConfigActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
+            android:parentActivityName=".activities.GameConfigurationWizardActivity" />
+
+        <!-- Missing Critical Activities -->
+        <activity
+            android:name=".activities.AdvancedDebugToolsActivity"
+            android:exported="false"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".activities.SessionAnalyticsDashboardActivity"
+            android:name=".activities.AdvancedDebuggingActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
         <activity
             android:name=".activities.AIPerformanceComparisonActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Voice Command Configuration Activity -->
-        <activity
-            android:name=".activities.VoiceCommandConfigurationActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Advanced Debugging Tools Activity -->
-        <activity
-            android:name=".activities.AdvancedDebuggingToolsActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Object Labeling Training Activity -->
-        <activity
-            android:name=".activities.ObjectLabelingTrainingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Neural Network Training Activity -->
-        <activity
-            android:name=".activities.NeuralNetworkTrainingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
-
-        <!-- Additional Analytics Activities -->
-        <activity
-            android:name=".activities.RealTimeAnalyticsDashboardActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
 
         <activity
             android:name=".activities.GameSpecificStrategyConfigActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.GameConfigurationWizardActivity" />
 
         <activity
-            android:name=".activities.AdvancedGestureTrainingActivity"
+            android:name=".activities.GameStrategyConfigurationActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.GameConfigurationWizardActivity" />
 
         <activity
-            android:name=".activities.VoiceCommandConfigurationActivity"
+            android:name=".activities.GestureSequenceBuilderActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AdvancedGestureTrainingActivity" />
 
         <activity
-            android:name=".activities.AdvancedDebugToolsActivity"
+            android:name=".activities.RealTimeAITrainingDashboardActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
 
-        <!-- Missing Critical Activities -->
         <activity
-            android:name=".activities.PerformanceMonitoringDashboardActivity"
+            android:name=".activities.RealTimeAnalyticsDashboardActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AnalyticsActivity" />
+
+        <activity
+            android:name=".activities.SessionAnalyticsDashboardActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AnalyticsActivity" />
 
         <activity
             android:name=".activities.StrategyConfigurationWizardActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
             android:parentActivityName=".MainActivity" />
 
         <activity
-            android:name=".activities.AITrainingDashboardActivity"
+            android:name=".activities.TouchAutomationEditorActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.AdvancedGestureTrainingActivity" />
 
-        <!-- Touch Automation Service (Accessibility) - PRIMARY SERVICE -->
+        <activity
+            android:name=".activities.TrainingProgressVisualizerActivity"
+            android:exported="false"
+            android:parentActivityName=".activities.AITrainingDashboardActivity" />
+
+        <!-- Services -->
+        
+        <!-- Touch Automation Service (Primary) -->
         <service
             android:name=".services.TouchAutomationService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="true">
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
@@ -264,16 +251,23 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <!-- Game Automation Accessibility Service -->
+        <service
+            android:name=".services.GameAutomationAccessibilityService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/game_automation_accessibility_config" />
+        </service>
+
         <!-- Gesture Recognition Service -->
         <service
             android:name=".services.GestureRecognitionService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="camera|microphone" />
-
-        <!-- Overlay Service -->
-        <service
-            android:name=".OverlayService"
             android:enabled="true"
             android:exported="false" />
 
@@ -284,18 +278,17 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
+        <!-- Voice Command Service -->
+        <service
+            android:name=".services.VoiceCommandService"
+            android:enabled="true"
+            android:exported="false" />
+
         <!-- Debug Overlay Service -->
         <service
             android:name=".services.DebugOverlayService"
             android:enabled="true"
             android:exported="false" />
-
-        <!-- Voice Command Service -->
-        <service
-            android:name=".services.VoiceCommandService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="microphone" />
 
         <!-- Service Health Monitor -->
         <service
@@ -303,36 +296,30 @@
             android:enabled="true"
             android:exported="false" />
 
-        <!-- GameAutomationAccessibilityService - CRITICAL SERVICE -->
+        <!-- Missing OverlayService Registration -->
         <service
-            android:name=".services.GameAutomationAccessibilityService"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="true"
-            android:enabled="true">
+            android:name=".OverlayService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Broadcast Receivers for Fragment Communication -->
+        <receiver
+            android:name=".messaging.UINavigationReceiver"
+            android:enabled="true"
+            android:exported="false">
             <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
+                <action android:name="com.gestureai.gameautomation.UI_NAVIGATION" />
             </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/accessibility_service_config" />
-        </service>
+        </receiver>
 
-
-
-
-
-        <!-- File Provider for sharing data -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.provider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
-        </provider>
-
-
+        <receiver
+            android:name=".messaging.VoiceCommandReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.gestureai.gameautomation.VOICE_COMMAND" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

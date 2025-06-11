@@ -2,7 +2,7 @@ package com.gestureai.gameautomation.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
+import timber.log.Timber;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
@@ -20,7 +20,7 @@ import java.util.List;
  * OpenCV Helper for computer vision operations
  */
 public class OpenCVHelper {
-    private static final String TAG = "OpenCVHelper";
+
     private static boolean isInitialized = false;
     private static Context appContext;
     
@@ -48,12 +48,12 @@ public class OpenCVHelper {
         public void onManagerConnected(int status) {
             switch (status) {
                 case LoaderCallbackInterface.SUCCESS:
-                    Log.d(TAG, "OpenCV loaded successfully");
+                    Timber.d("OpenCV loaded successfully");
                     isInitialized = true;
                     initializeDetectors();
                     break;
                 default:
-                    Log.e(TAG, "OpenCV initialization failed");
+                    Timber.e("OpenCV initialization failed");
                     isInitialized = false;
                     break;
             }
@@ -70,25 +70,25 @@ public class OpenCVHelper {
         try {
             // Try static initialization first (from AAR file)
             if (OpenCVLoader.initDebug()) {
-                Log.d(TAG, "OpenCV static initialization successful");
+                Timber.d("OpenCV static initialization successful");
                 isInitialized = true;
                 initializeDetectors();
                 return;
             }
             
             // Fallback to async initialization
-            Log.d(TAG, "Attempting OpenCV async initialization");
+            Timber.d("Attempting OpenCV async initialization");
             boolean asyncResult = OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, context, new BaseLoaderCallback(context) {
                 @Override
                 public void onManagerConnected(int status) {
                     switch (status) {
                         case LoaderCallbackInterface.SUCCESS:
-                            Log.d(TAG, "OpenCV async initialization successful");
+                            Timber.d("OpenCV async initialization successful");
                             isInitialized = true;
                             initializeDetectors();
                             break;
                         case LoaderCallbackInterface.INIT_FAILED:
-                            Log.e(TAG, "OpenCV initialization failed");
+                            Timber.e("OpenCV initialization failed");
                             isInitialized = false;
                             break;
                         case LoaderCallbackInterface.INSTALL_CANCELED:

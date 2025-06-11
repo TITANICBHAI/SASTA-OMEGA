@@ -2,7 +2,7 @@ package com.gestureai.gameautomation.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
+import timber.log.Timber;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.support.common.FileUtil;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.Arrays;
  * TensorFlow Lite Helper for object detection and classification
  */
 public class TensorFlowLiteHelper {
-    private static final String TAG = "TensorFlowLiteHelper";
+
     
     private Interpreter objectDetectionInterpreter;
     private Interpreter gestureClassifierInterpreter;
@@ -68,9 +68,9 @@ public class TensorFlowLiteHelper {
                 Interpreter.Options options = new Interpreter.Options();
                 options.setNumThreads(4);
                 objectDetectionInterpreter = new Interpreter(objectDetectionModel, options);
-                Log.d(TAG, "Object detection model loaded successfully");
+                Timber.d("Object detection model loaded successfully");
             } catch (IOException e) {
-                Log.w(TAG, "Object detection model not found, creating fallback interpreter", e);
+                Timber.w(e, "Object detection model not found, creating fallback interpreter");
                 objectDetectionInterpreter = null; // Will use fallback detection
             }
             
@@ -80,18 +80,18 @@ public class TensorFlowLiteHelper {
                 Interpreter.Options options = new Interpreter.Options();
                 options.setNumThreads(2);
                 gestureClassifierInterpreter = new Interpreter(gestureModel, options);
-                Log.d(TAG, "Gesture classifier model loaded successfully");
+                Timber.d("Gesture classifier model loaded successfully");
             } catch (IOException e) {
-                Log.w(TAG, "Gesture classifier model not found, using rule-based fallback", e);
+                Timber.w(e, "Gesture classifier model not found, using rule-based fallback");
                 gestureClassifierInterpreter = null; // Will use rule-based classification
             }
             
             // Mark as initialized even if models are missing - fallbacks will handle it
             isInitialized = true;
-            Log.d(TAG, "TensorFlow Lite helper initialized with available models");
+            Timber.d("TensorFlow Lite helper initialized with available models");
             
         } catch (Exception e) {
-            Log.e(TAG, "Critical error during TensorFlow Lite initialization", e);
+            Timber.e(e, "Critical error during TensorFlow Lite initialization");
             isInitialized = true; // Still set to true to enable fallback methods
             objectDetectionInterpreter = null;
             gestureClassifierInterpreter = null;
@@ -102,7 +102,7 @@ public class TensorFlowLiteHelper {
         List<Detection> detections = new ArrayList<>();
         
         if (!isInitialized || objectDetectionInterpreter == null) {
-            Log.w(TAG, "Object detection not initialized, returning empty results");
+            Timber.w("Object detection not initialized, returning empty results");
             return detections;
         }
         
@@ -145,7 +145,7 @@ public class TensorFlowLiteHelper {
             }
             
         } catch (Exception e) {
-            Log.e(TAG, "Error during object detection inference", e);
+            Timber.e(e, "Error during object detection inference");
         }
         
         return detections;

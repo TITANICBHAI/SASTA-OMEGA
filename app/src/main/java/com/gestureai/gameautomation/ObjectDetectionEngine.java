@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.util.Log;
+import timber.log.Timber;
 import com.gestureai.gameautomation.utils.TensorFlowLiteHelper;
 import com.gestureai.gameautomation.utils.OpenCVHelper;
 import com.google.mlkit.vision.common.InputImage;
@@ -24,7 +24,7 @@ import java.util.concurrent.Executors;
  * Object Detection Engine - Multi-method computer vision system
  */
 public class ObjectDetectionEngine {
-    private static final String TAG = "ObjectDetectionEngine";
+
     
     private Context context;
     private ObjectDetector mlKitDetector;
@@ -84,10 +84,10 @@ public class ObjectDetectionEngine {
             tfHelper = new TensorFlowLiteHelper();
             tfHelper.initializeObjectDetection(context);
             
-            Log.d(TAG, "Object detection engines initialized");
+            Timber.d("Object detection engines initialized");
             
         } catch (Exception e) {
-            Log.e(TAG, "Error initializing detection engines", e);
+            Timber.e(e, "Error initializing detection engines");
         }
     }
     
@@ -119,13 +119,13 @@ public class ObjectDetectionEngine {
             startRealTimeDetection();
         }
         
-        Log.d(TAG, "Object detection started");
+        Timber.d("Object detection started");
     }
     
     public void stopDetection() {
         this.isDetecting = false;
         this.detectionCallback = null;
-        Log.d(TAG, "Object detection stopped");
+        Timber.d("Object detection stopped");
     }
     
     private void startRealTimeDetection() {
@@ -141,7 +141,7 @@ public class ObjectDetectionEngine {
                 } catch (InterruptedException e) {
                     break;
                 } catch (Exception e) {
-                    Log.e(TAG, "Error in real-time detection", e);
+                    Timber.e(e, "Error in real-time detection");
                 }
             }
         });
@@ -165,7 +165,7 @@ public class ObjectDetectionEngine {
                             allDetections.addAll(mlKitResults);
                         }
                     } catch (OutOfMemoryError e) {
-                        Log.e(TAG, "ML Kit detection OOM, disabling", e);
+                        Timber.e(e, "ML Kit detection OOM, disabling");
                         mlKitEnabled = false;
                     }
                 }
@@ -178,7 +178,7 @@ public class ObjectDetectionEngine {
                             allDetections.addAll(tfResults);
                         }
                     } catch (OutOfMemoryError e) {
-                        Log.e(TAG, "TensorFlow detection OOM, disabling", e);
+                        Timber.e(e, "TensorFlow detection OOM, disabling");
                         tensorFlowEnabled = false;
                     }
                 }
@@ -191,7 +191,7 @@ public class ObjectDetectionEngine {
                             allDetections.addAll(cvResults);
                         }
                     } catch (OutOfMemoryError e) {
-                        Log.e(TAG, "OpenCV detection OOM, disabling", e);
+                        Timber.e(e, "OpenCV detection OOM, disabling");
                         openCVEnabled = false;
                     }
                 }
@@ -208,7 +208,7 @@ public class ObjectDetectionEngine {
                 try {
                     processedImage = drawBoundingBoxes(inputBitmap, filteredResults);
                 } catch (OutOfMemoryError e) {
-                    Log.e(TAG, "OOM creating processed image, using original", e);
+                    Timber.e(e, "OOM creating processed image, using original");
                     processedImage = inputBitmap;
                 }
                 
@@ -219,13 +219,13 @@ public class ObjectDetectionEngine {
                 }
                 
             } catch (OutOfMemoryError e) {
-                Log.e(TAG, "Critical OOM during object detection", e);
+                Timber.e(e, "Critical OOM during object detection");
                 System.gc(); // Force garbage collection
                 if (detectionCallback != null) {
                     detectionCallback.onDetectionError("Memory exhausted during detection");
                 }
             } catch (Exception e) {
-                Log.e(TAG, "Error during object detection", e);
+                Timber.e(e, "Error during object detection");
                 if (detectionCallback != null) {
                     detectionCallback.onDetectionError(e.getMessage());
                 }
@@ -237,7 +237,7 @@ public class ObjectDetectionEngine {
                             processedImage.recycle();
                         }
                     } catch (Exception e) {
-                        Log.w(TAG, "Error recycling processed image", e);
+                        Timber.w(e, "Error recycling processed image");
                     }
                 }
             }
@@ -270,11 +270,11 @@ public class ObjectDetectionEngine {
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "ML Kit detection failed", e);
+                    Timber.e(e, "ML Kit detection failed");
                 });
                 
         } catch (Exception e) {
-            Log.e(TAG, "Error in ML Kit detection", e);
+            Timber.e(e, "Error in ML Kit detection");
         }
         
         return results;
@@ -304,7 +304,7 @@ public class ObjectDetectionEngine {
             }
             
         } catch (Exception e) {
-            Log.e(TAG, "Error in TensorFlow detection", e);
+            Timber.e(e, "Error in TensorFlow detection");
         }
         
         return results;
@@ -334,7 +334,7 @@ public class ObjectDetectionEngine {
             }
             
         } catch (Exception e) {
-            Log.e(TAG, "Error in OpenCV detection", e);
+            Timber.e(e, "Error in OpenCV detection");
         }
         
         return results;
@@ -398,7 +398,7 @@ public class ObjectDetectionEngine {
     
     public void trainCustomModel() {
         // Simulate custom model training
-        Log.d(TAG, "Starting custom model training...");
+        Timber.d("Starting custom model training...");
         
         // In real implementation, this would:
         // 1. Collect labeled training data
@@ -409,7 +409,7 @@ public class ObjectDetectionEngine {
         // Simulated training process
         try {
             Thread.sleep(5000); // Simulate training time
-            Log.d(TAG, "Custom model training completed");
+            Timber.d("Custom model training completed");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -421,10 +421,10 @@ public class ObjectDetectionEngine {
         
         try {
             // In real implementation, save the actual model file
-            Log.d(TAG, "Model exported to: " + exportPath);
+            Timber.d("Model exported to: " + exportPath);
             return exportPath;
         } catch (Exception e) {
-            Log.e(TAG, "Error exporting model", e);
+            Timber.e(e, "Error exporting model");
             throw new RuntimeException("Export failed: " + e.getMessage());
         }
     }
@@ -472,7 +472,7 @@ public class ObjectDetectionEngine {
                 try {
                     mlKitDetector.close();
                 } catch (Exception e) {
-                    Log.w(TAG, "Error closing ML Kit detector", e);
+                    Timber.w(e, "Error closing ML Kit detector");
                 }
                 mlKitDetector = null;
             }
@@ -482,7 +482,7 @@ public class ObjectDetectionEngine {
                 try {
                     tfHelper.cleanup();
                 } catch (Exception e) {
-                    Log.w(TAG, "Error cleaning up TensorFlow helper", e);
+                    Timber.w(e, "Error cleaning up TensorFlow helper");
                 }
                 tfHelper = null;
             }
@@ -490,9 +490,9 @@ public class ObjectDetectionEngine {
             // Clear callback to prevent memory leaks
             detectionCallback = null;
             
-            Log.d(TAG, "Object detection engine cleaned up successfully");
+            Timber.d("Object detection engine cleaned up successfully");
         } catch (Exception e) {
-            Log.e(TAG, "Error during ObjectDetectionEngine cleanup", e);
+            Timber.e(e, "Error during ObjectDetectionEngine cleanup");
         }
     }
 }

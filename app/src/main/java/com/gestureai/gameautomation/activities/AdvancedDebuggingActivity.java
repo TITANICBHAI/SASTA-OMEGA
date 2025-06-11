@@ -15,10 +15,6 @@ import com.gestureai.gameautomation.utils.MemoryManager;
 import com.gestureai.gameautomation.managers.ServiceConnectionManager;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import android.widget.ScrollView;
 
 /**
  * Advanced Debugging Activity
@@ -270,14 +266,14 @@ public class AdvancedDebuggingActivity extends AppCompatActivity {
             addDebugLog("Error exporting logs: " + e.getMessage());
         }
     }
-
+    
     private void addDebugLog(String message) {
-        String timestamp = new SimpleDateFormat("HH:mm:ss",
-                Locale.getDefault()).format(new Date());
+        String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", 
+            java.util.Locale.getDefault()).format(new java.util.Date());
         String logEntry = "[" + timestamp + "] " + message + "\n";
-
+        
         debugLogBuffer.append(logEntry);
-
+        
         if (tvDebugLog != null) {
             runOnUiThread(() -> {
                 tvDebugLog.append(logEntry);
